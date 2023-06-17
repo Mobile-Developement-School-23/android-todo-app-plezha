@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch
+package com.example.nahachilzanoch.util
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,21 +10,27 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TodoListViewModel : ViewModel() {
-    private val _todoList = MutableStateFlow(
-        TodosRepository.get()
-                to { _: TodoItem -> true }
-    )// I hate it. These are the list and filter predicate
+    private val _todoList = MutableStateFlow(TodosRepository.get())
     val todoList = _todoList.asStateFlow()
     var completedAmount = MutableStateFlow(0)
+    var showPredicate = MutableStateFlow { _: TodoItem -> true }
+
 
     init {
         viewModelScope.launch {
-            TodosRepository.todoList.collect { newValue ->
-                _todoList.update { (_, predicate) ->
-                    newValue.filter(predicate) to predicate
+            launch {
+                TodosRepository.todoList.collect { newValue ->
+                    _todoList.update { newValue }
+                    completedAmount.update {
+                        todoList.value.count { it.done }
+                    }
                 }
-                completedAmount.update {
-                    todoList.value.first.count { it.done }
+            }
+            launch {
+                showPredicate.collect { newPredicate ->
+                    _todoList.update {
+                        TodosRepository.todoList.value.filter(newPredicate)
+                    }
                 }
             }
         }
@@ -42,8 +48,7 @@ class TodoListViewModel : ViewModel() {
         TodosRepository.update( newList )
     }
 
-    fun setPredicate(newPredicate: (TodoItem) -> Boolean) {
-        println(newPredicate)
-        _todoList.update { TodosRepository.todoList.value.filter(newPredicate) to newPredicate}
+    fun deleteItem(item: TodoItem) {
+        TodosRepository.delete(item)
     }
 }

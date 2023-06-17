@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch
+package com.example.nahachilzanoch.screens
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,6 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
+import com.example.nahachilzanoch.R
+import com.example.nahachilzanoch.util.TodoItemsAdapter
+import com.example.nahachilzanoch.util.TodoListViewModel
 import com.example.nahachilzanoch.databinding.MainFragmentBinding
 import kotlinx.coroutines.launch
 
@@ -34,10 +37,10 @@ class MainFragment: Fragment() {
         todosRV.adapter = todoItemsAdapter
 
         if (showTextView.text == "Show") {
-            viewModel.setPredicate { true }
+            viewModel.showPredicate.value = { true }
             showTextView.text = "Hide"
         } else {
-            viewModel.setPredicate { !it.done }
+            viewModel.showPredicate.value = { !it.done }
             showTextView.text = "Show"
         }
 
@@ -49,7 +52,7 @@ class MainFragment: Fragment() {
             launch {
                 viewModel.todoList.collect {
                     if (!todosRV.isComputingLayout && todosRV.scrollState == SCROLL_STATE_IDLE) {
-                        todoItemsAdapter.todoItems = it.first
+                        todoItemsAdapter.todoItems = it
                     }
                 }
             }
@@ -73,10 +76,10 @@ class MainFragment: Fragment() {
 
         showTextView.setOnClickListener {
             if (showTextView.text == "Show") {
-                viewModel.setPredicate { true }
+                viewModel.showPredicate.value = { true }
                 showTextView.text = "Hide"
             } else {
-                viewModel.setPredicate { !it.done }
+                viewModel.showPredicate.value = { !it.done }
                 showTextView.text = "Show"
             }
         }

@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch
+package com.example.nahachilzanoch.screens
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.nahachilzanoch.R
+import com.example.nahachilzanoch.util.TodoListViewModel
 import com.example.nahachilzanoch.data.TodosRepository
 import com.example.nahachilzanoch.databinding.EditFragmentBinding
 import com.example.nahachilzanoch.model.TodoItem
@@ -87,6 +89,11 @@ class EditFragment : Fragment() {
         }
 
         binding.back.setOnClickListener {
+            findNavController().navigate(R.id.action_fragment2_to_fragment1)
+        }
+
+        binding.delete.setOnClickListener {
+            viewModel.deleteItem(todoItem)
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
 

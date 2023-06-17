@@ -48,6 +48,13 @@ object TodosRepository {
         _todoList.update { newValue }
     }
 
+    fun delete(item: TodoItem) {
+        _todoList.update {
+            val newList = it.toMutableList()
+            it.filter { it.id != item.id }
+        }
+    }
+
     fun get(): List<TodoItem> {
         return _todoList.value
     }

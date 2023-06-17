@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch
+package com.example.nahachilzanoch.util
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +8,10 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.lifecycle.ViewModel
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.nahachilzanoch.databinding.TodoItemBinding
+import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.model.TodoItem
 import com.example.nahachilzanoch.model.Urgency
 
@@ -60,8 +59,8 @@ class TodoItemsAdapter :
                 )
             }
 
-            checkbox.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.addOrChangeItem(todoItem.copy(done = isChecked))
+            checkbox.setOnClickListener {
+                viewModel.addOrChangeItem(todoItem.copy(done = !todoItem.done))
             }
 
         }
