@@ -9,6 +9,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -23,7 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainFragment: Fragment() {
-    private val viewModel by viewModels<TodoListViewModel>()
+    private val viewModel by activityViewModels<TodoListViewModel>()
 
     private var _binding: MainFragmentBinding? = null
     // This property is only valid between onCreateView and onDestroyView.

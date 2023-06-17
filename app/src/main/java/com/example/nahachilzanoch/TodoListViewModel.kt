@@ -7,6 +7,7 @@ import com.example.nahachilzanoch.model.TodoItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TodoListViewModel : ViewModel() {
@@ -14,16 +15,17 @@ class TodoListViewModel : ViewModel() {
     val todoList = _todoList.asStateFlow()
 
     fun addOrChange(newItem: TodoItem) {
-        val newList = _todoList.value.toMutableList()
-        val index = newList.indexOfFirst { it.id == newItem.id }
+        _todoList.update {
+            val newList = it.toMutableList()
+            val index = newList.indexOfFirst { it.id == newItem.id }
 
-        if (index == -1)
-            newList.add( newItem )
-        else
-            newList[ index ] = newItem
-
-        viewModelScope.launch(Dispatchers.IO) {
-            _todoList.value = newList
+            if (index == -1)
+                newList.add( newItem )
+            else
+                newList[ index ] = newItem
+            newList
         }
+
+        println(_todoList)
     }
 }
