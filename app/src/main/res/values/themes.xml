@@ -2,8 +2,8 @@
     <style name="Theme.Nahachilzanoch" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:colorBackground">@color/back_light_primary</item>
 
-        <item name="colorSurface">@color/back_dark_primary</item>
-        <item name="colorOnSurface">@color/label_dark_primary</item>
+        <item name="colorSurface">@color/back_light_primary</item>
+        <item name="colorOnSurface">@color/label_light_primary</item>
 
 
         <item name="colorPrimary">@color/color_light_blue</item>

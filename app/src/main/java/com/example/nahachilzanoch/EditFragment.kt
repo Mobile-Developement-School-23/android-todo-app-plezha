@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.nahachilzanoch.data.TodosRepository
 import com.example.nahachilzanoch.databinding.EditFragmentBinding
@@ -66,7 +65,10 @@ class EditFragment : Fragment() {
                 Urgency.URGENT -> R.id.buttonUrgencyUrgent
             }
         )
-        deadlineSwitch.isChecked = todoItem.deadline != null
+        if (todoItem.deadline != null) {
+            deadlineSwitch.isChecked = true
+            binding.deadlinePickerLine.visibility = View.VISIBLE
+        }
 
         deadlineSlider.valueTo = Integer.MAX_VALUE.toFloat()
         /*
@@ -89,7 +91,7 @@ class EditFragment : Fragment() {
         }
 
         binding.save.setOnClickListener {
-            viewModel.addOrChange(
+            viewModel.addOrChangeItem(
                 todoItem.copy(
                     text = textView.text.toString(),
                     urgency = when (toggleButton.checkedButtonId) {

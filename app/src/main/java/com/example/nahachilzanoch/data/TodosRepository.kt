@@ -2,6 +2,10 @@ package com.example.nahachilzanoch.data
 
 import com.example.nahachilzanoch.model.TodoItem
 import com.example.nahachilzanoch.model.Urgency
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.lang.StringBuilder
 import java.util.*
 
@@ -12,7 +16,8 @@ val largeString = StringBuilder().apply {
 }.toString()
 
 object TodosRepository {
-    private val todos = mutableListOf<TodoItem>()
+    private var _todoList = MutableStateFlow<List<TodoItem>>( listOf() )
+    var todoList = _todoList.asStateFlow()
 
     private var suitableIdInt = 0 // TODO: think of something better
 
@@ -35,10 +40,16 @@ object TodosRepository {
         }
     }
 
-    fun add(item: TodoItem) = todos.add(item)
+    fun add(item: TodoItem) {
+        _todoList.update { it + item }
+    }
+
+    fun update(newValue: List<TodoItem>) {
+        _todoList.update { newValue }
+    }
 
     fun get(): List<TodoItem> {
-        return todos
+        return _todoList.value
     }
 
 }
