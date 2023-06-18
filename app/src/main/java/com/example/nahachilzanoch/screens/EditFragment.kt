@@ -1,10 +1,14 @@
 package com.example.nahachilzanoch.screens
 
+import android.app.DatePickerDialog
+import android.graphics.Paint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.nahachilzanoch.R
@@ -13,11 +17,11 @@ import com.example.nahachilzanoch.data.TodosRepository
 import com.example.nahachilzanoch.databinding.EditFragmentBinding
 import com.example.nahachilzanoch.model.TodoItem
 import com.example.nahachilzanoch.model.Urgency
+import com.example.nahachilzanoch.util.getDate
+import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.*
 
-private fun Float.getDateTime(): String {
-    return Date(this.toLong() * 1000).toString() // TODO: make it localized
-}
+
 
 class EditFragment : Fragment() {
     private val viewModel by activityViewModels<TodoListViewModel>()
@@ -38,12 +42,14 @@ class EditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //viewModel = ViewModelProvider(this).get(Fragment2ViewModel::class.java)
-        val deadlineTextView = binding.deadlineTextView
-        val deadlineSlider = binding.deadlineSlider
-        val textView = binding.text
-        val toggleButton = binding.toggleButton
-        val deadlineSwitch = binding.deadlineSwitch
+        val datePicker =
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .build()
+
+        var deadlineTime = Calendar.getInstance().time.time
+
+        binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
 
         val todoItem =
             if (arguments != null) {
@@ -51,16 +57,16 @@ class EditFragment : Fragment() {
             } else {
                 TodoItem(
                     id = TodosRepository.suitableId,
-                    creationDate = Calendar.getInstance().time,
+                    creationDate = Calendar.getInstance().time.time,
                     done = false,
                     text = "",
                     urgency = Urgency.NORMAL
                 )
             }
 
-        textView.setText(todoItem.text)
+        binding.todoText.setText(todoItem.text)
 
-        toggleButton.check(
+        binding.toggleButton.check(
             when (todoItem.urgency) {
                 Urgency.LOW -> R.id.buttonUrgencyLow
                 Urgency.NORMAL -> R.id.buttonUrgencyNormal
@@ -68,27 +74,28 @@ class EditFragment : Fragment() {
             }
         )
         if (todoItem.deadline != null) {
-            deadlineSwitch.isChecked = true
-            binding.deadlinePickerLine.visibility = View.VISIBLE
+            binding.deadlineSwitch.isChecked = true
+            binding.deadlinePickerLine.isVisible = true
+            binding.deadlineDate.text = todoItem.deadline.getDate()
+        } else {
+            binding.deadlinePickerLine.isVisible = false
         }
 
-        deadlineSlider.valueTo = Integer.MAX_VALUE.toFloat()
-        /*
-        // Make it 00:00:00 of today
-        val curTimeSeconds = Calendar.getInstance().time.time / 1000f
-        deadlineSlider.value = curTimeSeconds - curTimeSeconds % (24 * 60 * 60)
-        */
-        deadlineSlider.valueFrom = deadlineSlider.value
-
-        if (todoItem.deadline != null) deadlineSlider.value = todoItem.deadline.time / 1000f
-
-        deadlineTextView.text = deadlineSlider.value.getDateTime()
-
-        deadlineSlider.addOnChangeListener { _, value, _ ->
-            deadlineTextView.text = value.getDateTime()
+        binding.deadlineDate.setOnClickListener {
+            MaterialDatePicker.Builder.datePicker()
+                .setSelection(
+                MaterialDatePicker.todayInUtcMilliseconds()
+            )
+            datePicker.show(parentFragmentManager, "")
         }
 
-        binding.back.setOnClickListener {
+        datePicker.addOnPositiveButtonClickListener {
+            deadlineTime = it
+            binding.deadlineDate.text = it.getDate()
+        }
+
+
+        binding.backTextView.setOnClickListener {
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
 
@@ -100,24 +107,24 @@ class EditFragment : Fragment() {
         binding.save.setOnClickListener {
             viewModel.addOrChangeItem(
                 todoItem.copy(
-                    text = textView.text.toString(),
-                    urgency = when (toggleButton.checkedButtonId) {
+                    text = binding.todoText.text.toString(),
+                    urgency = when (binding.toggleButton.checkedButtonId) {
                         R.id.buttonUrgencyLow -> Urgency.LOW
                         R.id.buttonUrgencyNormal -> Urgency.NORMAL
                         R.id.buttonUrgencyUrgent -> Urgency.URGENT
                         else -> Urgency.NORMAL // Any way to delete that stub?
                     },
-                    deadline =
-                    if (deadlineSwitch.isChecked)
-                        Date(deadlineSlider.value.toLong() * 1000L)
-                    else null,
+                    deadline = deadlineTime,
+                    lastEditTime = Calendar.getInstance().time.time,
                 )
             )
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
 
         binding.deadlineSwitch.setOnCheckedChangeListener { _, isChecked ->
-            binding.deadlinePickerLine.visibility = if (isChecked) View.VISIBLE else View.GONE
+            deadlineTime = Calendar.getInstance().time.time
+            binding.deadlineDate.text = deadlineTime.getDate()
+            binding.deadlinePickerLine.isVisible = isChecked
         }
     }
 

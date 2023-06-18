@@ -10,7 +10,7 @@
     tools:context=".screens.MainFragment">
 
     <TextView
-        android:id="@+id/task"
+        android:id="@+id/taskTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -22,7 +22,7 @@
         />
 
     <TextView
-        android:id="@+id/back"
+        android:id="@+id/backTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -36,7 +36,7 @@
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/task"
+        app:layout_constraintTop_toBottomOf="@id/taskTextView"
         app:layout_constraintLeft_toLeftOf="parent"
         android:hint="Your todo text..."
         app:boxStrokeWidth="0dp"
@@ -44,7 +44,7 @@
 
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/text"
+            android:id="@+id/todoText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
@@ -52,7 +52,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
-        android:id="@+id/urgency_line"
+        android:id="@+id/urgencyLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/textInputLayout"
@@ -101,10 +101,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/deadline_switch_line"
+        android:id="@+id/deadlineSwitchLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/urgency_line"
+        app:layout_constraintTop_toBottomOf="@id/urgencyLine"
         app:layout_constraintLeft_toLeftOf="parent"
         >
 
@@ -122,35 +122,23 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/deadline_picker_line"
+        android:id="@+id/deadlinePickerLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/deadline_switch_line"
+        app:layout_constraintTop_toBottomOf="@id/deadlineSwitchLine"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:visibility="gone"
-        android:background="@drawable/athirdofarolf"
-        android:orientation="vertical">
-
+        android:visibility="visible"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/deadline_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:gravity="center_horizontal"
+            android:id="@+id/deadlineDate"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:text="date"
+            android:gravity="center"
+            android:textColor="@color/color_dark_blue"
 
-            android:shadowColor="@color/white"
-            android:shadowDx="1.5"
-            android:shadowDy="1.3"
-            android:shadowRadius="2.3"
-            android:textAllCaps="true"
             />
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/deadline_slider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
 
     </LinearLayout>
 

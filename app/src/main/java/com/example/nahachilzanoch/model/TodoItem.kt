@@ -9,9 +9,9 @@ data class TodoItem(
     val urgency: Urgency,
     val done: Boolean,
 
-    val creationDate: Date,
-    val deadline: Date? = null,
-    val lastEditTime: Date? = null,
+    val creationDate: Long,
+    val deadline: Long? = null,
+    val lastEditTime: Long? = null,
 ) : Serializable
 // Both too lazy to generate uid for it and to put items in a bundle one-by-one
 

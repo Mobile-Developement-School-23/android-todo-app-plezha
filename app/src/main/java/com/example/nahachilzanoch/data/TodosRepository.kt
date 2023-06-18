@@ -33,8 +33,8 @@ object TodosRepository {
                     urgency =
                     listOf(Urgency.LOW, Urgency.NORMAL, Urgency.NORMAL, Urgency.URGENT).random(),
                     done = listOf(false, false, true).random(),
-                    creationDate = Calendar.getInstance().time,
-                    deadline = listOf(Date( (0..Int.MAX_VALUE).random()*1000L ), null).random()
+                    creationDate = Calendar.getInstance().time.time,
+                    deadline = listOf((0..Int.MAX_VALUE).random()*1000L, null, null).random()
                 )
             )
         }

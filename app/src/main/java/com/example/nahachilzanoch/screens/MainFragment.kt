@@ -1,12 +1,15 @@
 package com.example.nahachilzanoch.screens
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
@@ -31,8 +34,17 @@ class MainFragment: Fragment() {
 
         val todosRV = binding.todos
         val showTextView = binding.show
-        val todoItemsAdapter = TodoItemsAdapter()
-        todoItemsAdapter.viewModel = viewModel
+        val todoItemsAdapter = TodoItemsAdapter(
+            onCheckBoxClicked = { viewModel.addOrChangeItem(it.copy(done = !it.done)) },
+            onItemClicked = { item, view ->
+                val bundle = Bundle().apply {
+                    putSerializable("todoItem", item)
+                }
+                Navigation.findNavController(view).navigate(
+                    R.id.action_fragment1_to_fragment2, bundle
+                )
+            }
+        )
 
         todosRV.adapter = todoItemsAdapter
 
@@ -51,9 +63,7 @@ class MainFragment: Fragment() {
         viewLifecycleOwner.lifecycleScope.launch() {
             launch {
                 viewModel.todoList.collect {
-                    if (!todosRV.isComputingLayout && todosRV.scrollState == SCROLL_STATE_IDLE) {
                         todoItemsAdapter.todoItems = it
-                    }
                 }
             }
             launch {
@@ -83,6 +93,19 @@ class MainFragment: Fragment() {
                 showTextView.text = "Show"
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finish()
+                }
+            }
+        )
+
     }
     override fun onDestroyView() {
         super.onDestroyView()

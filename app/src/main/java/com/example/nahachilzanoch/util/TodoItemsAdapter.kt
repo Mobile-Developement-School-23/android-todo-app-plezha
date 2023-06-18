@@ -8,6 +8,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -15,13 +16,16 @@ import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.model.TodoItem
 import com.example.nahachilzanoch.model.Urgency
 
-class TodoItemsAdapter :
+class TodoItemsAdapter(
+    private val onCheckBoxClicked: (TodoItem) -> Unit,
+    private val onItemClicked: (TodoItem, View) -> Unit
+) :
     RecyclerView.Adapter<TodoItemsAdapter.TodoItemViewHolder>() {
-    lateinit var viewModel: TodoListViewModel // Is it ok?
 
     class TodoItemViewHolder(
         itemView: View,
-        private val viewModel: TodoListViewModel
+        private val onCheckBoxClicked: (TodoItem) -> Unit,
+        private val onItemClicked: (TodoItem, View) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val checkbox = itemView.findViewById<CheckBox>(R.id.checkbox)
@@ -35,34 +39,24 @@ class TodoItemsAdapter :
             checkbox.isChecked = todoItem.done
 
             if (todoItem.deadline == null)
-                dateLine.visibility = View.GONE
+                dateLine.isVisible = false
             else {
-                dateTextView.text = todoItem.deadline.toString()
+                dateTextView.text = todoItem.deadline.getDate()
             }
 
-            urgencyImage.visibility =
-                if (todoItem.urgency == Urgency.LOW) View.VISIBLE else View.GONE
+            urgencyImage.isVisible = todoItem.urgency == Urgency.LOW
 
-            urgencyTextView.visibility =
-                if (todoItem.urgency == Urgency.URGENT) View.VISIBLE else View.GONE
+            urgencyTextView.isVisible = todoItem.urgency == Urgency.URGENT
 
             todoTextView.text = todoItem.text
 
-
             itemView.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putSerializable("todoItem", todoItem)
-                }
-
-                Navigation.findNavController(itemView).navigate(
-                    R.id.action_fragment1_to_fragment2, bundle
-                )
+                onItemClicked(todoItem, itemView)
             }
 
             checkbox.setOnClickListener {
-                viewModel.addOrChangeItem(todoItem.copy(done = !todoItem.done))
+                onCheckBoxClicked(todoItem)
             }
-
         }
     }
 
@@ -86,7 +80,8 @@ class TodoItemsAdapter :
                     parent,
                     false
                 ),
-            viewModel
+            onCheckBoxClicked,
+            onItemClicked
         )
 
     }
@@ -96,21 +91,5 @@ class TodoItemsAdapter :
     override fun onBindViewHolder(holder: TodoItemViewHolder, position: Int) {
         holder.bind(todoItems[position])
     }
-
-}
-
-class TodoItemDiffCallback(
-    private val oldItems: List<TodoItem>,
-    private val newItems: List<TodoItem>
-) : DiffUtil.Callback() {
-    override fun getOldListSize() = oldItems.size
-
-    override fun getNewListSize() = newItems.size
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        newItems[newItemPosition].id == oldItems[oldItemPosition].id
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        newItems[newItemPosition] == oldItems[oldItemPosition]
 
 }
