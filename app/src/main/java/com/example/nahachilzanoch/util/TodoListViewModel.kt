@@ -20,9 +20,9 @@ class TodoListViewModel : ViewModel() {
         viewModelScope.launch {
             launch {
                 TodosRepository.todoList.collect { newValue ->
-                    _todoList.update { newValue }
+                    _todoList.update { newValue.filter(showPredicate.value) }
                     completedAmount.update {
-                        todoList.value.count { it.done }
+                        newValue.count { it.done }
                     }
                 }
             }

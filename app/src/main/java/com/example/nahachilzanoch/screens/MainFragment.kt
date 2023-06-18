@@ -1,6 +1,5 @@
 package com.example.nahachilzanoch.screens
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.util.TodoItemsAdapter
 import com.example.nahachilzanoch.util.TodoListViewModel
