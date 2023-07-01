@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/whole_fucking_todo_item"
+    android:id="@+id/wholeFuckingTask"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
@@ -63,7 +63,7 @@
                 />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/todo_text"
+                android:id="@+id/taskText"
                 android:ellipsize="end"
                 android:maxLines="3"
                 android:layout_width="wrap_content"
@@ -88,7 +88,7 @@
                 android:src="@drawable/baseline_calendar_month_24" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/date_text"
+                android:id="@+id/dateText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

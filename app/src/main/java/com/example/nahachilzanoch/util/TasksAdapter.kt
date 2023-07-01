@@ -1,6 +1,5 @@
 package com.example.nahachilzanoch.util
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,61 +8,60 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.nahachilzanoch.R
-import com.example.nahachilzanoch.model.TodoItem
+import com.example.nahachilzanoch.model.Task
 import com.example.nahachilzanoch.model.Urgency
 
-class TodoItemsAdapter(
-    private val onCheckBoxClicked: (TodoItem) -> Unit,
-    private val onItemClicked: (TodoItem, View) -> Unit
+class TasksAdapter(
+    private val onCheckBoxClicked: (Task) -> Unit,
+    private val onItemClicked: (Task, View) -> Unit
 ) :
-    RecyclerView.Adapter<TodoItemsAdapter.TodoItemViewHolder>() {
+    RecyclerView.Adapter<TasksAdapter.TaskViewHolder>() {
 
-    class TodoItemViewHolder(
+    class TaskViewHolder(
         itemView: View,
-        private val onCheckBoxClicked: (TodoItem) -> Unit,
-        private val onItemClicked: (TodoItem, View) -> Unit
+        private val onCheckBoxClicked: (Task) -> Unit,
+        private val onItemClicked: (Task, View) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val checkbox = itemView.findViewById<CheckBox>(R.id.checkbox)
-        private val dateTextView = itemView.findViewById<TextView>(R.id.date_text)
-        private val todoTextView = itemView.findViewById<TextView>(R.id.todo_text)
+        private val dateTextView = itemView.findViewById<TextView>(R.id.dateText)
+        private val taskTextView = itemView.findViewById<TextView>(R.id.taskText)
         private val dateLine = itemView.findViewById<LinearLayout>(R.id.dateLine)
         private val urgencyImage = itemView.findViewById<ImageView>(R.id.urgencyImage)
         private val urgencyTextView = itemView.findViewById<TextView>(R.id.urgencyTextView)
 
-        fun bind(todoItem: TodoItem) {
-            checkbox.isChecked = todoItem.done
+        fun bind(task: Task) {
+            checkbox.isChecked = task.isDone
 
-            if (todoItem.deadline == null)
+            if (task.deadlineDate == null)
                 dateLine.isVisible = false
             else {
-                dateTextView.text = todoItem.deadline.getDate()
+                dateTextView.text = task.deadlineDate.getDate()
             }
 
-            urgencyImage.isVisible = todoItem.urgency == Urgency.LOW
+            urgencyImage.isVisible = task.urgency == Urgency.LOW
 
-            urgencyTextView.isVisible = todoItem.urgency == Urgency.URGENT
+            urgencyTextView.isVisible = task.urgency == Urgency.URGENT
 
-            todoTextView.text = todoItem.text
+            taskTextView.text = task.text
 
             itemView.setOnClickListener {
-                onItemClicked(todoItem, itemView)
+                onItemClicked(task, itemView)
             }
 
             checkbox.setOnClickListener {
-                onCheckBoxClicked(todoItem)
+                onCheckBoxClicked(task)
             }
         }
     }
 
-    var todoItems = listOf<TodoItem>()
+    var tasks = listOf<Task>()
         set(value) {
             DiffUtil.calculateDiff(
-                TodoItemDiffCallback(
+                TasksDiffCallback(
                     field,
                     value,
                 )
@@ -71,12 +69,12 @@ class TodoItemsAdapter(
             field = value
         }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoItemViewHolder {
-        return TodoItemViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+        return TaskViewHolder(
             LayoutInflater
                 .from(parent.context)
                 .inflate(
-                    R.layout.todo_item,
+                    R.layout.task_layout,
                     parent,
                     false
                 ),
@@ -86,10 +84,10 @@ class TodoItemsAdapter(
 
     }
 
-    override fun getItemCount() = todoItems.size
+    override fun getItemCount() = tasks.size
 
-    override fun onBindViewHolder(holder: TodoItemViewHolder, position: Int) {
-        holder.bind(todoItems[position])
+    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+        holder.bind(tasks[position])
     }
 
 }

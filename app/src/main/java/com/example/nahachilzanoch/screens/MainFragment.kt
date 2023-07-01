@@ -12,13 +12,13 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.nahachilzanoch.R
-import com.example.nahachilzanoch.util.TodoItemsAdapter
-import com.example.nahachilzanoch.util.TodoListViewModel
+import com.example.nahachilzanoch.util.TasksAdapter
+import com.example.nahachilzanoch.util.TaskListViewModel
 import com.example.nahachilzanoch.databinding.MainFragmentBinding
 import kotlinx.coroutines.launch
 
 class MainFragment: Fragment() {
-    private val viewModel by activityViewModels<TodoListViewModel>()
+    private val viewModel by activityViewModels<TaskListViewModel> { TaskListViewModel.Factory }
 
     private var _binding: MainFragmentBinding? = null
     // This property is only valid between onCreateView and onDestroyView.
@@ -30,13 +30,13 @@ class MainFragment: Fragment() {
     ): View {
         _binding = MainFragmentBinding.inflate(inflater, container, false)
 
-        val todosRV = binding.todos
+        val tasksRV = binding.tasks
         val showTextView = binding.show
-        val todoItemsAdapter = TodoItemsAdapter(
-            onCheckBoxClicked = { viewModel.addOrChangeItem(it.copy(done = !it.done)) },
-            onItemClicked = { item, view ->
+        val tasksAdapter = TasksAdapter(
+            onCheckBoxClicked = { viewModel.addOrChangeItem(it.copy(isDone = !it.isDone)) },
+            onItemClicked = { task, view ->
                 val bundle = Bundle().apply {
-                    putSerializable("todoItem", item)
+                    putSerializable("task", task)
                 }
                 Navigation.findNavController(view).navigate(
                     R.id.action_fragment1_to_fragment2, bundle
@@ -44,24 +44,24 @@ class MainFragment: Fragment() {
             }
         )
 
-        todosRV.adapter = todoItemsAdapter
+        tasksRV.adapter = tasksAdapter
 
         if (showTextView.text == "Show") {
             viewModel.showPredicate.value = { true }
             showTextView.text = "Hide"
         } else {
-            viewModel.showPredicate.value = { !it.done }
+            viewModel.showPredicate.value = { !it.isDone }
             showTextView.text = "Show"
         }
 
-        todosRV.layoutManager =
+        tasksRV.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
 
         viewLifecycleOwner.lifecycleScope.launch() {
             launch {
-                viewModel.todoList.collect {
-                        todoItemsAdapter.todoItems = it
+                viewModel.taskList.collect {
+                        tasksAdapter.tasks = it
                 }
             }
             launch {
@@ -87,7 +87,7 @@ class MainFragment: Fragment() {
                 viewModel.showPredicate.value = { true }
                 showTextView.text = "Hide"
             } else {
-                viewModel.showPredicate.value = { !it.done }
+                viewModel.showPredicate.value = { !it.isDone }
                 showTextView.text = "Show"
             }
         }

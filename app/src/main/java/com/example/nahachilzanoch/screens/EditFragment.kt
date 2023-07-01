@@ -1,6 +1,5 @@
 package com.example.nahachilzanoch.screens
 
-import android.app.DatePickerDialog
 import android.graphics.Paint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,14 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.nahachilzanoch.R
-import com.example.nahachilzanoch.util.TodoListViewModel
-import com.example.nahachilzanoch.data.TodosRepository
+import com.example.nahachilzanoch.util.TaskListViewModel
+import com.example.nahachilzanoch.data.TasksRepository
 import com.example.nahachilzanoch.databinding.EditFragmentBinding
-import com.example.nahachilzanoch.model.TodoItem
+import com.example.nahachilzanoch.model.Task
 import com.example.nahachilzanoch.model.Urgency
 import com.example.nahachilzanoch.util.getDate
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -24,7 +22,7 @@ import java.util.*
 
 
 class EditFragment : Fragment() {
-    private val viewModel by activityViewModels<TodoListViewModel>()
+    private val viewModel by activityViewModels<TaskListViewModel> { TaskListViewModel.Factory }
 
     private var _binding: EditFragmentBinding? = null
 
@@ -51,32 +49,32 @@ class EditFragment : Fragment() {
 
         binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
 
-        val todoItem =
+        val task =
             if (arguments != null) {
-                requireArguments().getSerializable("todoItem") as TodoItem
+                requireArguments().getSerializable("task") as Task
             } else {
-                TodoItem(
-                    id = TodosRepository.suitableId,
+                Task(
+                    id = UUID.randomUUID().toString(),
                     creationDate = Calendar.getInstance().time.time,
-                    done = false,
+                    isDone = false,
                     text = "",
                     urgency = Urgency.NORMAL
                 )
             }
 
-        binding.todoText.setText(todoItem.text)
+        binding.taskText.setText(task.text)
 
         binding.toggleButton.check(
-            when (todoItem.urgency) {
+            when (task.urgency) {
                 Urgency.LOW -> R.id.buttonUrgencyLow
                 Urgency.NORMAL -> R.id.buttonUrgencyNormal
                 Urgency.URGENT -> R.id.buttonUrgencyUrgent
             }
         )
-        if (todoItem.deadline != null) {
+        if (task.deadlineDate != null) {
             binding.deadlineSwitch.isChecked = true
             binding.deadlinePickerLine.isVisible = true
-            binding.deadlineDate.text = todoItem.deadline.getDate()
+            binding.deadlineDate.text = task.deadlineDate.getDate()
         } else {
             binding.deadlinePickerLine.isVisible = false
         }
@@ -100,22 +98,22 @@ class EditFragment : Fragment() {
         }
 
         binding.delete.setOnClickListener {
-            viewModel.deleteItem(todoItem)
+            viewModel.deleteItem(task)
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
 
         binding.save.setOnClickListener {
             viewModel.addOrChangeItem(
-                todoItem.copy(
-                    text = binding.todoText.text.toString(),
+                task.copy(
+                    text = binding.taskText.text.toString(),
                     urgency = when (binding.toggleButton.checkedButtonId) {
                         R.id.buttonUrgencyLow -> Urgency.LOW
                         R.id.buttonUrgencyNormal -> Urgency.NORMAL
                         R.id.buttonUrgencyUrgent -> Urgency.URGENT
                         else -> Urgency.NORMAL // Any way to delete that stub?
                     },
-                    deadline = deadlineTime,
-                    lastEditTime = Calendar.getInstance().time.time,
+                    deadlineDate = deadlineTime,
+                    lastEditDate = Calendar.getInstance().time.time,
                 )
             )
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
