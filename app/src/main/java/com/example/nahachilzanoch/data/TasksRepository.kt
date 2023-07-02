@@ -1,9 +1,6 @@
 package com.example.nahachilzanoch.data
 
-import android.content.Context
-import android.util.Log
 import com.example.nahachilzanoch.data.local.Task
-import com.example.nahachilzanoch.util.getAndroidID
 import kotlinx.coroutines.flow.Flow
 
 class TasksRepository(
@@ -35,9 +32,9 @@ class TasksRepository(
         remoteDataSource.insertTask(task)
     }
 
-    suspend fun updateCompleted(taskId: String, done: Boolean) {
-        localDataSource.updateCompleted(taskId, done)
-        remoteDataSource.updateCompleted(taskId, done)
+    suspend fun updateCompleted(taskId: String) {
+        localDataSource.changeCompleted(taskId)
+        remoteDataSource.changeCompleted(taskId)
     }
     suspend fun deleteTask(taskId: String) {
         localDataSource.deleteTask(taskId)

@@ -14,7 +14,7 @@ interface DataSource {
 
     suspend fun putTask(task: Task)
 
-    suspend fun updateCompleted(taskId: String, done: Boolean)
+    suspend fun changeCompleted(taskId: String)
 
     suspend fun deleteTask(taskId: String)
 }

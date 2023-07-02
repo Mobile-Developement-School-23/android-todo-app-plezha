@@ -45,7 +45,6 @@ class TaskListViewModel(
                         if (tasks.isSuccess) {
                             tasks.getOrNull()!!
                         } else {
-                            println(tasks.onFailure { println(it) })
                             listOf()
                         }
                     }
@@ -62,8 +61,8 @@ class TaskListViewModel(
         viewModelScope.launch(Dispatchers.IO) { tasksRepository.deleteTask(item.id) }
     }
 
-    fun updateCompleted(taskId: String, done: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) { tasksRepository.updateCompleted(taskId, done) }
+    fun updateCompleted(taskId: String) {
+        viewModelScope.launch(Dispatchers.IO) { tasksRepository.updateCompleted(taskId) }
     }
 
     companion object {

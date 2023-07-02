@@ -2,6 +2,7 @@ package com.example.nahachilzanoch.screens
 
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -37,50 +38,21 @@ class EditFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupDatePicker(
-        onDeadlineChange: (Long) -> Unit
-    ): MaterialDatePicker<Long> {
-        val datePicker =
-            MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .build()
-
-        datePicker.addOnPositiveButtonClickListener {
-            onDeadlineChange(it)
-            binding.deadlineDate.text = it.getDate()
-        }
-
-        return datePicker
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val datePicker = setupDatePicker {
-            binding.deadlineDate.text = it.getDate()
-        }
         val task = getTask()
 
-        var deadlineTime = Calendar.getInstance().time.time
+        var deadlineTime: Long? = null
+
+        val datePicker = setupDatePicker {
+            deadlineTime = it
+            binding.deadlineDate.text = it.getDate()
+        }
 
         binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
 
         binding.taskText.setText(task.text)
-
-        binding.toggleButton.check(
-            when (task.urgency) {
-                Urgency.LOW -> R.id.buttonUrgencyLow
-                Urgency.NORMAL -> R.id.buttonUrgencyNormal
-                Urgency.URGENT -> R.id.buttonUrgencyUrgent
-            }
-        )
-        if (task.deadlineDate != null) {
-            binding.deadlineSwitch.isChecked = true
-            binding.deadlinePickerLine.isVisible = true
-            binding.deadlineDate.text = task.deadlineDate.getDate()
-        } else {
-            binding.deadlinePickerLine.isVisible = false
-        }
 
         binding.deadlineDate.setOnClickListener {
             MaterialDatePicker.Builder.datePicker()
@@ -99,6 +71,11 @@ class EditFragment : Fragment() {
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
 
+        binding.deadlineSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) onDeadlineChange( Calendar.getInstance().time.time )
+            binding.deadlinePickerLine.isVisible = isChecked
+        }
+
         binding.save.setOnClickListener {
             viewModel.addOrChangeItem(
                 task.copy(
@@ -115,14 +92,7 @@ class EditFragment : Fragment() {
             )
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
-
-        binding.deadlineSwitch.setOnCheckedChangeListener { _, isChecked ->
-            deadlineTime = Calendar.getInstance().time.time
-            binding.deadlineDate.text = deadlineTime.getDate()
-            binding.deadlinePickerLine.isVisible = isChecked
-        }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -142,4 +112,36 @@ class EditFragment : Fragment() {
                 lastEditDate = Calendar.getInstance().time.time,
             )
         }
+
+    private fun setupDatePicker(
+        onDeadlineChange: (Long) -> Unit
+    ): MaterialDatePicker<Long> {
+        val datePicker =
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .build()
+
+        datePicker.addOnPositiveButtonClickListener {
+            onDeadlineChange(it)
+            binding.deadlineDate.text = it.getDate()
+        }
+        return datePicker
+    }
+
+    private fun initTask(task: Task) {
+        binding.toggleButton.check(
+            when (task.urgency) {
+                Urgency.LOW -> R.id.buttonUrgencyLow
+                Urgency.NORMAL -> R.id.buttonUrgencyNormal
+                Urgency.URGENT -> R.id.buttonUrgencyUrgent
+            }
+        )
+        if (task.deadlineDate != null) {
+            binding.deadlineSwitch.isChecked = true
+            binding.deadlinePickerLine.isVisible = true
+            binding.deadlineDate.text = task.deadlineDate.getDate()
+        } else {
+            binding.deadlinePickerLine.isVisible = false
+        }
+    }
 }

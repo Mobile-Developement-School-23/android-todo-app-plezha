@@ -41,8 +41,6 @@ class MainFragment: Fragment() {
             showTextView.text = "Show"
         }
 
-
-
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.completedAmount.collect {
@@ -93,7 +91,7 @@ class MainFragment: Fragment() {
     fun setupRV() {
         val tasksRV = binding.tasks
         val tasksAdapter = TasksAdapter(
-            onCheckBoxClicked = { viewModel.addOrChangeItem(it.copy(isDone = !it.isDone)) },
+            onCheckBoxClicked = { viewModel.updateCompleted(it.id) },
             onItemClicked = { task, view ->
                 val bundle = Bundle().apply {
                     putSerializable("task", task)

@@ -42,9 +42,9 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun updateCompleted(taskId: String, done: Boolean) {
+    override suspend fun changeCompleted(taskId: String) {
         withContext(Dispatchers.IO) {
-            tasksDao.updateCompleted(taskId, done)
+            tasksDao.changeCompleted(taskId)
         }
     }
 
