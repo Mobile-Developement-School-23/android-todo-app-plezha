@@ -6,15 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.util.TaskListViewModel
-import com.example.nahachilzanoch.data.TasksRepository
 import com.example.nahachilzanoch.databinding.EditFragmentBinding
-import com.example.nahachilzanoch.model.Task
-import com.example.nahachilzanoch.model.Urgency
+import com.example.nahachilzanoch.data.local.Task
+import com.example.nahachilzanoch.data.local.Urgency
 import com.example.nahachilzanoch.util.getDate
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.*
@@ -37,30 +37,33 @@ class EditFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    private fun setupDatePicker(
+        onDeadlineChange: (Long) -> Unit
+    ): MaterialDatePicker<Long> {
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
                 .build()
 
+        datePicker.addOnPositiveButtonClickListener {
+            onDeadlineChange(it)
+            binding.deadlineDate.text = it.getDate()
+        }
+
+        return datePicker
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val datePicker = setupDatePicker {
+            binding.deadlineDate.text = it.getDate()
+        }
+        val task = getTask()
+
         var deadlineTime = Calendar.getInstance().time.time
 
         binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
-
-        val task =
-            if (arguments != null) {
-                requireArguments().getSerializable("task") as Task
-            } else {
-                Task(
-                    id = UUID.randomUUID().toString(),
-                    creationDate = Calendar.getInstance().time.time,
-                    isDone = false,
-                    text = "",
-                    urgency = Urgency.NORMAL
-                )
-            }
 
         binding.taskText.setText(task.text)
 
@@ -86,12 +89,6 @@ class EditFragment : Fragment() {
             )
             datePicker.show(parentFragmentManager, "")
         }
-
-        datePicker.addOnPositiveButtonClickListener {
-            deadlineTime = it
-            binding.deadlineDate.text = it.getDate()
-        }
-
 
         binding.backTextView.setOnClickListener {
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
@@ -131,4 +128,18 @@ class EditFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun getTask(): Task =
+        if (arguments != null) {
+            requireArguments().getSerializable("task") as Task
+        } else {
+            Task(
+                id = UUID.randomUUID().toString(),
+                creationDate = Calendar.getInstance().time.time,
+                isDone = false,
+                text = "",
+                urgency = Urgency.NORMAL,
+                lastEditDate = Calendar.getInstance().time.time,
+            )
+        }
 }

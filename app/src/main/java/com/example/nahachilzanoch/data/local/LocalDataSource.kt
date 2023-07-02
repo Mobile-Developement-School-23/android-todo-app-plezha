@@ -1,6 +1,6 @@
-package com.example.nahachilzanoch.data
+package com.example.nahachilzanoch.data.local
 
-import com.example.nahachilzanoch.model.Task
+import com.example.nahachilzanoch.data.DataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,10 +17,6 @@ class LocalDataSource(
         return withContext(Dispatchers.IO) {
             Result.success(tasksDao.getTasks())
         }
-    }
-
-    override fun observeTask(taskId: String): Flow<Result<Task>> {
-        return tasksDao.observeTaskById(taskId).map { Result.success(it) }
     }
 
     override suspend fun getTask(taskId: String): Result<Task> {
@@ -40,8 +36,10 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun updateCompleted(task: Task, done: Boolean) {
-        updateCompleted(task.id, done)
+    override suspend fun putTask(task: Task) {
+        withContext(Dispatchers.IO) {
+            tasksDao.updateTask(task)
+        }
     }
 
     override suspend fun updateCompleted(taskId: String, done: Boolean) {

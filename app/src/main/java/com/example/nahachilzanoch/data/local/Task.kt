@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.model
+package com.example.nahachilzanoch.data.local
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -15,11 +15,13 @@ data class Task(
 
     @ColumnInfo(name = "creationDate") val creationDate: Long,
     @ColumnInfo(name = "deadlineDate") val deadlineDate: Long? = null,
-    @ColumnInfo(name = "lastEditDate") val lastEditDate: Long? = null,
+    @ColumnInfo(name = "lastEditDate") val lastEditDate: Long,
 ) : Serializable
 
-enum class Urgency {
-    LOW, NORMAL, URGENT
+enum class Urgency(val importance: String) {
+    LOW("low"),
+    NORMAL("basic"),
+    URGENT("important")
 }
 
 

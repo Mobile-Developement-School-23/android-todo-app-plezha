@@ -11,8 +11,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.nahachilzanoch.R
-import com.example.nahachilzanoch.model.Task
-import com.example.nahachilzanoch.model.Urgency
+import com.example.nahachilzanoch.data.local.Task
+import com.example.nahachilzanoch.data.local.Urgency
 
 class TasksAdapter(
     private val onCheckBoxClicked: (Task) -> Unit,

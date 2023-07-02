@@ -30,21 +30,8 @@ class MainFragment: Fragment() {
     ): View {
         _binding = MainFragmentBinding.inflate(inflater, container, false)
 
-        val tasksRV = binding.tasks
+        setupRV()
         val showTextView = binding.show
-        val tasksAdapter = TasksAdapter(
-            onCheckBoxClicked = { viewModel.addOrChangeItem(it.copy(isDone = !it.isDone)) },
-            onItemClicked = { task, view ->
-                val bundle = Bundle().apply {
-                    putSerializable("task", task)
-                }
-                Navigation.findNavController(view).navigate(
-                    R.id.action_fragment1_to_fragment2, bundle
-                )
-            }
-        )
-
-        tasksRV.adapter = tasksAdapter
 
         if (showTextView.text == "Show") {
             viewModel.showPredicate.value = { true }
@@ -54,16 +41,9 @@ class MainFragment: Fragment() {
             showTextView.text = "Show"
         }
 
-        tasksRV.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
 
-        viewLifecycleOwner.lifecycleScope.launch() {
-            launch {
-                viewModel.taskList.collect {
-                        tasksAdapter.tasks = it
-                }
-            }
+        viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.completedAmount.collect {
                     binding.completed.text = "Completed - $it"
@@ -108,5 +88,32 @@ class MainFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun setupRV() {
+        val tasksRV = binding.tasks
+        val tasksAdapter = TasksAdapter(
+            onCheckBoxClicked = { viewModel.addOrChangeItem(it.copy(isDone = !it.isDone)) },
+            onItemClicked = { task, view ->
+                val bundle = Bundle().apply {
+                    putSerializable("task", task)
+                }
+                Navigation.findNavController(view).navigate(
+                    R.id.action_fragment1_to_fragment2, bundle
+                )
+            }
+        )
+        tasksRV.adapter = tasksAdapter
+        tasksRV.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+
+        viewLifecycleOwner.lifecycleScope.launch{
+            launch {
+                viewModel.taskList.collect {
+                    tasksAdapter.tasks = it
+                }
+            }
+        }
+
     }
 }

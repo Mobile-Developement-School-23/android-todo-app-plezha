@@ -1,12 +1,10 @@
-package com.example.nahachilzanoch.data
+package com.example.nahachilzanoch.data.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.nahachilzanoch.model.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -2,24 +2,44 @@ package com.example.nahachilzanoch
 
 import android.app.Application
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.example.nahachilzanoch.data.LocalDataSource
-import com.example.nahachilzanoch.data.TasksDatabase
+import com.example.nahachilzanoch.data.local.LocalDataSource
+import com.example.nahachilzanoch.data.local.TasksDatabase
 import com.example.nahachilzanoch.data.TasksRepository
+import com.example.nahachilzanoch.data.remote.RemoteDataSource
+import com.example.nahachilzanoch.data.remote.TasksApiService
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+const val BASE_URL = "https://beta.mrdekk.ru/todobackend/"
 
 class TodoApplication : Application() {
     lateinit var tasksRepository: TasksRepository
     override fun onCreate() {
         super.onCreate()
+
+        val retrofit = Retrofit.Builder()
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .baseUrl(BASE_URL)
+            .build()
+
+        val tasksApiService = retrofit.create(TasksApiService::class.java)
+
+        val remoteDataSource = RemoteDataSource(
+            tasksApiService,
+            applicationContext,
+        )
+
         val localDataSource = LocalDataSource(
             Room.databaseBuilder(
-                this.applicationContext,
-                TasksDatabase::class.java, "Tasks.db"
+                applicationContext,
+                TasksDatabase::class.java, "Tasks.db",
             ).build().taskDao()
         )
-        this.tasksRepository = TasksRepository(
+        tasksRepository = TasksRepository(
             localDataSource,
-            localDataSource
+            remoteDataSource
         )
     }
 }

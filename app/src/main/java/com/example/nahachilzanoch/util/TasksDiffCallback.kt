@@ -1,7 +1,7 @@
 package com.example.nahachilzanoch.util
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.nahachilzanoch.model.Task
+import com.example.nahachilzanoch.data.local.Task
 
 class TasksDiffCallback(
     private val oldItems: List<Task>,

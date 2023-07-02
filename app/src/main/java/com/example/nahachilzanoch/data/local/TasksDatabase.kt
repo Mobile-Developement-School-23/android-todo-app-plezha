@@ -1,8 +1,7 @@
-package com.example.nahachilzanoch.data
+package com.example.nahachilzanoch.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.nahachilzanoch.model.Task
 
 @Database(entities = [Task::class], version = 1, exportSchema = false)
 abstract class TasksDatabase : RoomDatabase() {
