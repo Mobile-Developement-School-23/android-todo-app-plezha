@@ -7,6 +7,7 @@ import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.util.toList
 import com.example.nahachilzanoch.util.toTaskAndRevision
 import com.example.nahachilzanoch.util.toTaskRequest
+import com.example.nahachilzanoch.util.withRetry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -25,7 +26,7 @@ class RemoteDataSource(
     override suspend fun getTasks(): Result<List<Task>> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = tasksApiService.getTasks()
+                val response = withRetry { tasksApiService.getTasks() }
                 if (response.isSuccessful) {
                     lastKnownRevision = response.body()!!.revision
                     Result.success(response.body()!!.toList())
@@ -47,7 +48,7 @@ class RemoteDataSource(
     override suspend fun getTask(taskId: String): Result<Task> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = tasksApiService.getTask(taskId)
+                val response = withRetry { tasksApiService.getTask(taskId) }
                 if (response.isSuccessful) {
                     val (task, revision) = response.body()!!.toTaskAndRevision()
                     lastKnownRevision = revision
@@ -67,15 +68,17 @@ class RemoteDataSource(
         }
     }
 
-    override suspend fun insertTask(task: Task) {
+    override suspend fun addTask(task: Task) {
         withContext(Dispatchers.IO) {
             try {
                 val taskRequest = task.toTaskRequest(context)
-                val response = tasksApiService.putTask(
-                    lastKnownRevision,
-                    task.id,
-                    taskRequest
-                )
+                val response = withRetry {
+                    tasksApiService.putTask(
+                        lastKnownRevision,
+                        task.id,
+                        taskRequest
+                    )
+                }
                 if (response.isSuccessful) {
                     val (receivedTask, revision) = response.body()!!.toTaskAndRevision()
                     lastKnownRevision = revision
@@ -96,14 +99,17 @@ class RemoteDataSource(
         }
     }
 
-    override suspend fun putTask(task: Task) {
+    override suspend fun updateTask(task: Task) {
         withContext(Dispatchers.IO) {
             try {
-                val response = tasksApiService.putTask(
-                    lastKnownRevision,
-                    task.id,
-                    task.toTaskRequest(context),
-                )
+                val response = withRetry {
+                    tasksApiService.putTask(
+                        lastKnownRevision,
+                        task.id,
+                        task.toTaskRequest(context),
+                    )
+                }
+
                 if (response.isSuccessful) {
                     Result.success(response.body()!!.toTaskAndRevision().first)
                 } else {
@@ -118,16 +124,18 @@ class RemoteDataSource(
     override suspend fun changeCompleted(taskId: String) {
         withContext(Dispatchers.IO) {
             try {
-                val task = getTask(taskId)
+                val task = withRetry { getTask(taskId) }
                 if (task.isSuccess) {
                     val task = task.getOrNull()!!
-                    val response = tasksApiService.putTask(
-                        lastKnownRevision,
-                        taskId,
-                        task
-                            .copy(isDone = !task.isDone)
-                            .toTaskRequest(context)
-                    )
+                    val response = withRetry {
+                        tasksApiService.putTask(
+                            lastKnownRevision,
+                            taskId,
+                            task
+                                .copy(isDone = !task.isDone)
+                                .toTaskRequest(context)
+                        )
+                    }
                     if (response.isSuccessful) {
                         lastKnownRevision = response.body()!!.revision
                     } else { // TODO
@@ -146,10 +154,12 @@ class RemoteDataSource(
     override suspend fun deleteTask(taskId: String) {
         withContext(Dispatchers.IO) {
             try {
-                val response = tasksApiService.deleteTask(
-                    lastKnownRevision,
-                    taskId
-                )
+                val response = withRetry {
+                    tasksApiService.deleteTask(
+                        lastKnownRevision,
+                        taskId
+                    )
+                }
                 if (response.isSuccessful) {
                     val (task, revision) = response.body()!!.toTaskAndRevision()
                     lastKnownRevision = revision

@@ -8,7 +8,9 @@ import com.example.nahachilzanoch.data.remote.models.TaskResponse
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
 import com.example.nahachilzanoch.data.remote.models.TaskNWModel
+import kotlinx.coroutines.delay
 import java.util.Date
+import kotlin.coroutines.cancellation.CancellationException
 
 fun Long.getDate(): String {
     return Date(this).toString()
@@ -64,4 +66,33 @@ fun TaskListResponse.toList(): List<Task> {
         list.add(it.toTask())
     }
     return list.toList()
+}
+
+
+suspend fun <T> withRetry(
+    tryCnt: Int = 10,
+    fallbackValue: T? = null,
+    intervalMillis: (attempt: Int) -> Long = { it*2000L },
+    retryCheck: (Throwable) -> Boolean = { true },
+    block: suspend () -> T,
+): T {
+    try {
+        val retryCnt = tryCnt - 1
+        repeat(retryCnt) { attempt ->
+            try {
+                return block()
+            } catch (e: Exception) {
+                if (e is CancellationException || !retryCheck(e)) {
+                    throw e
+                }
+            }
+            delay(intervalMillis(attempt + 1))
+        }
+        return block()
+    } catch (e: Exception) {
+        if (e is CancellationException) {
+            throw e
+        }
+        return fallbackValue ?: throw e
+    }
 }

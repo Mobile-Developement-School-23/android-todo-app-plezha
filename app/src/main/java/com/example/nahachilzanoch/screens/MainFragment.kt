@@ -41,6 +41,8 @@ class MainFragment: Fragment() {
             showTextView.text = "Show"
         }
 
+
+
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.completedAmount.collect {
@@ -58,6 +60,10 @@ class MainFragment: Fragment() {
 
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_fragment1_to_fragment2)
+        }
+
+        binding.refreshTasks.setOnClickListener {
+            viewModel.updateFromRemote()
         }
 
         showTextView.setOnClickListener {

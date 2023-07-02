@@ -10,9 +10,9 @@ interface DataSource {
 
     suspend fun getTask(taskId: String): Result<Task>
 
-    suspend fun insertTask(task: Task)
+    suspend fun addTask(task: Task)
 
-    suspend fun putTask(task: Task)
+    suspend fun updateTask(task: Task)
 
     suspend fun changeCompleted(taskId: String)
 

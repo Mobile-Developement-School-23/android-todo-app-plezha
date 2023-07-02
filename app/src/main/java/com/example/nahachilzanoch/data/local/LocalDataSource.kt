@@ -30,13 +30,13 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun insertTask(task: Task) {
+    override suspend fun addTask(task: Task) {
         withContext(Dispatchers.IO) {
             tasksDao.insertTask(task)
         }
     }
 
-    override suspend fun putTask(task: Task) {
+    override suspend fun updateTask(task: Task) {
         withContext(Dispatchers.IO) {
             tasksDao.updateTask(task)
         }

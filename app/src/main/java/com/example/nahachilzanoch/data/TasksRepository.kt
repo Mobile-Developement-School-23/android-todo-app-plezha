@@ -11,12 +11,26 @@ class TasksRepository(
         return localDataSource.observeTasks()
     }
 
-    suspend fun updateFromRemote() {
+    suspend fun updateFromRemote(): Boolean { // It is as good as backend is
         val remoteTasks = remoteDataSource.getTasks()
+
         if (remoteTasks.isSuccess) {
-            localDataSource.getTasks().getOrNull()?.forEach { localDataSource.deleteTask(it.id) }
-            remoteTasks.getOrNull()!!.forEach { localDataSource.insertTask(it) }
+            val localTasks = localDataSource.getTasks().getOrNull()!! // TODO
+            val localTasksMap = mutableMapOf<String, Int>() // Id to index
+            localTasks
+                .forEachIndexed { index, item -> localTasksMap[item.id] = index }
+            remoteTasks.getOrNull()!!.forEach { task ->
+                if (localTasksMap.containsKey(task.id)) {
+                    if (task.lastEditDate > localTasks[ localTasksMap[task.id]!! ].lastEditDate) {
+                        localDataSource.updateTask(task)
+                    } else {
+                        localDataSource.addTask(task)
+                    }
+                }
+                localDataSource.addTask(task)
+            }
         }
+        return remoteTasks.isSuccess
     }
 
     suspend fun getTasks(): Result<List<Task>> {
@@ -27,12 +41,17 @@ class TasksRepository(
         return localDataSource.getTask(taskId)
     }
 
-    suspend fun saveTask(task: Task) {
-        localDataSource.insertTask(task)
-        remoteDataSource.insertTask(task)
+    suspend fun addTask(task: Task) {
+        localDataSource.addTask(task)
+        remoteDataSource.addTask(task)
     }
 
-    suspend fun updateCompleted(taskId: String) {
+    suspend fun updateTask(task: Task) {
+        localDataSource.updateTask(task)
+        remoteDataSource.updateTask(task)
+    }
+
+    suspend fun changeCompleted(taskId: String) {
         localDataSource.changeCompleted(taskId)
         remoteDataSource.changeCompleted(taskId)
     }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class TaskListViewModel(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
-    private val _taskList = MutableStateFlow<List<Task>>( listOf() )
+    private val _taskList = MutableStateFlow<List<Task>>(listOf())
     val taskList = _taskList.asStateFlow()
     var completedAmount = MutableStateFlow(0)
     var showPredicate = MutableStateFlow { _: Task -> true }
@@ -41,11 +41,9 @@ class TaskListViewModel(
                 showPredicate.collect { newPredicate ->
                     // No reason to catch anything that never happens TODO
                     val tasks = tasksRepository.getTasks()
-                    _taskList.update {
-                        if (tasks.isSuccess) {
-                            tasks.getOrNull()!!
-                        } else {
-                            listOf()
+                    if (tasks.isSuccess) {
+                        _taskList.update {
+                            tasks.getOrNull()!!.filter(newPredicate)
                         }
                     }
                 }
@@ -54,7 +52,19 @@ class TaskListViewModel(
     }
 
     fun addOrChangeItem(newTask: Task) {
-        viewModelScope.launch(Dispatchers.IO) { tasksRepository.saveTask(newTask) }
+        viewModelScope.launch(Dispatchers.IO) {
+            if (tasksRepository.getTask(newTask.id).isSuccess) {
+                tasksRepository.updateTask(newTask)
+            } else {
+                tasksRepository.addTask(newTask)
+            }
+        }
+    }
+
+    fun updateFromRemote() {
+        viewModelScope.launch(Dispatchers.IO) {
+            tasksRepository.updateFromRemote()
+        }
     }
 
     fun deleteItem(item: Task) {
@@ -62,7 +72,7 @@ class TaskListViewModel(
     }
 
     fun updateCompleted(taskId: String) {
-        viewModelScope.launch(Dispatchers.IO) { tasksRepository.updateCompleted(taskId) }
+        viewModelScope.launch(Dispatchers.IO) { tasksRepository.changeCompleted(taskId) }
     }
 
     companion object {
