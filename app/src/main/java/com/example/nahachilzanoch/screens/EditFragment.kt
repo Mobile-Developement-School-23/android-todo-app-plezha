@@ -45,10 +45,11 @@ class EditFragment : Fragment() {
 
         var deadlineTime: Long? = null
 
-        val datePicker = setupDatePicker {
+        val onDeadlineChange = { it: Long ->
             deadlineTime = it
             binding.deadlineDate.text = it.getDate()
         }
+        val datePicker = setupDatePicker( onDeadlineChange )
 
         binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
 
