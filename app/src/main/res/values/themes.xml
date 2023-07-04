@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Theme.Nahachilzanoch" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:colorBackground">@color/back_light_primary</item>
 

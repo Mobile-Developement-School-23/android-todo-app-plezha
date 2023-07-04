@@ -2,24 +2,22 @@ package com.example.nahachilzanoch.screens
 
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.DatePicker
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.nahachilzanoch.R
-import com.example.nahachilzanoch.util.TaskListViewModel
-import com.example.nahachilzanoch.databinding.EditFragmentBinding
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
+import com.example.nahachilzanoch.databinding.EditFragmentBinding
+import com.example.nahachilzanoch.util.TaskListViewModel
 import com.example.nahachilzanoch.util.getDate
 import com.google.android.material.datepicker.MaterialDatePicker
-import java.util.*
-
+import java.util.Calendar
+import java.util.UUID
 
 
 class EditFragment : Fragment() {
@@ -52,6 +50,7 @@ class EditFragment : Fragment() {
         val datePicker = setupDatePicker( onDeadlineChange )
 
         binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
+        binding.deadlineDate.isVisible = task.deadlineDate != null
 
         binding.taskText.setText(task.text)
 

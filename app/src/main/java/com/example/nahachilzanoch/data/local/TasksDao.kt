@@ -65,7 +65,6 @@ interface TasksDao {
      * Update the complete status of a task
      *
      * @param taskId id of the task
-     * @param completed status to be updated
      */
     @Query("UPDATE tasks SET done = NOT done WHERE entryid = :taskId")
     suspend fun changeCompleted(taskId: String)

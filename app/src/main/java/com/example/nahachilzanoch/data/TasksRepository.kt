@@ -15,7 +15,7 @@ class TasksRepository(
         val remoteTasks = remoteDataSource.getTasks()
 
         if (remoteTasks.isSuccess) {
-            val localTasks = localDataSource.getTasks().getOrNull()!! // TODO
+            val localTasks = localDataSource.getTasks().getOrNull()!!
             val localTasksMap = mutableMapOf<String, Int>() // Id to index
             localTasks
                 .forEachIndexed { index, item -> localTasksMap[item.id] = index }
@@ -30,6 +30,7 @@ class TasksRepository(
                 localDataSource.addTask(task)
             }
         }
+        remoteDataSource.patchTasks( localDataSource.getTasks().getOrNull()!! )
         return remoteTasks.isSuccess
     }
 
@@ -41,23 +42,23 @@ class TasksRepository(
         return localDataSource.getTask(taskId)
     }
 
-    suspend fun addTask(task: Task) {
+    suspend fun addTask(task: Task): Result<Task> {
         localDataSource.addTask(task)
-        remoteDataSource.addTask(task)
+        return remoteDataSource.addTask(task)
     }
 
-    suspend fun updateTask(task: Task) {
+    suspend fun updateTask(task: Task): Result<Task> {
         localDataSource.updateTask(task)
-        remoteDataSource.updateTask(task)
+        return remoteDataSource.updateTask(task)
     }
 
-    suspend fun changeCompleted(taskId: String) {
+    suspend fun changeCompleted(taskId: String): Result<Task>  {
         localDataSource.changeCompleted(taskId)
-        remoteDataSource.changeCompleted(taskId)
+        return remoteDataSource.changeCompleted(taskId)
     }
-    suspend fun deleteTask(taskId: String) {
+    suspend fun deleteTask(taskId: String): Result<Task>  {
         localDataSource.deleteTask(taskId)
-        remoteDataSource.deleteTask(taskId)
+        return remoteDataSource.deleteTask(taskId)
     }
 
 

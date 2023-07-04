@@ -4,9 +4,9 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.example.nahachilzanoch.databinding.ActivityMainBinding
 import com.example.nahachilzanoch.util.TaskListViewModel
 

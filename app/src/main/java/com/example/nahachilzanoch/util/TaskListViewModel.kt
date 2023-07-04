@@ -1,5 +1,7 @@
 package com.example.nahachilzanoch.util
 
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -14,9 +16,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.net.UnknownHostException
 
 class TaskListViewModel(
-    private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository,
+    private val showToast: suspend (String) -> Unit,
 ) : ViewModel() {
     private val _taskList = MutableStateFlow<List<Task>>(listOf())
     val taskList = _taskList.asStateFlow()
@@ -26,10 +32,11 @@ class TaskListViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            tasksRepository.updateFromRemote()
+            launch {
+                updateFromRemote()
+            }
             launch {
                 tasksRepository.observeTasks().collect { newValue ->
-                    // No reason to catch anything that never happens TODO
                     val newValueList = newValue.getOrNull()!!
                     _taskList.update {
                         newValueList.filter(showPredicate.value)
@@ -39,12 +46,9 @@ class TaskListViewModel(
             }
             launch {
                 showPredicate.collect { newPredicate ->
-                    // No reason to catch anything that never happens TODO
                     val tasks = tasksRepository.getTasks()
-                    if (tasks.isSuccess) {
-                        _taskList.update {
-                            tasks.getOrNull()!!.filter(newPredicate)
-                        }
+                    _taskList.update {
+                        tasks.getOrNull()!!.filter(newPredicate)
                     }
                 }
             }
@@ -53,26 +57,41 @@ class TaskListViewModel(
 
     fun addOrChangeItem(newTask: Task) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (tasksRepository.getTask(newTask.id).isSuccess) {
+            val result = if (tasksRepository.getTask(newTask.id).isSuccess) {
                 tasksRepository.updateTask(newTask)
             } else {
                 tasksRepository.addTask(newTask)
             }
+            if (result.isFailure) showToast( result.getErrorStringForUser() )
         }
     }
 
     fun updateFromRemote() {
         viewModelScope.launch(Dispatchers.IO) {
-            tasksRepository.updateFromRemote()
+            if (!tasksRepository.updateFromRemote()) showToast("Network Error")
         }
     }
 
     fun deleteItem(item: Task) {
-        viewModelScope.launch(Dispatchers.IO) { tasksRepository.deleteTask(item.id) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = tasksRepository.deleteTask(item.id)
+            if (result.isFailure) showToast( result.getErrorStringForUser() )
+        }
     }
 
     fun updateCompleted(taskId: String) {
-        viewModelScope.launch(Dispatchers.IO) { tasksRepository.changeCompleted(taskId) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = tasksRepository.changeCompleted(taskId)
+            if (result.isFailure) showToast( result.getErrorStringForUser() )
+        }
+    }
+
+    private fun Result<Task>.getErrorStringForUser(): String {
+        Log.d("", exceptionOrNull()?.stackTraceToString()!!)
+        return if (
+            exceptionOrNull() is HttpException ||
+            exceptionOrNull() is UnknownHostException) "Network Error"
+        else "Unexpected Error"
     }
 
     companion object {
@@ -80,7 +99,18 @@ class TaskListViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as TodoApplication)
                 val tasksRepository = application.tasksRepository
-                TaskListViewModel(tasksRepository)
+
+                TaskListViewModel(
+                    tasksRepository
+                ) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            application.applicationContext,
+                            it,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         }
     }

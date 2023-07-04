@@ -4,14 +4,17 @@ import android.content.Context
 import android.util.Log
 import com.example.nahachilzanoch.data.DataSource
 import com.example.nahachilzanoch.data.local.Task
+import com.example.nahachilzanoch.data.remote.models.TaskResponse
 import com.example.nahachilzanoch.util.toList
 import com.example.nahachilzanoch.util.toTaskAndRevision
+import com.example.nahachilzanoch.util.toTaskListRequest
 import com.example.nahachilzanoch.util.toTaskRequest
 import com.example.nahachilzanoch.util.withRetry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import java.lang.Exception
+import retrofit2.HttpException
+import retrofit2.Response
 
 class RemoteDataSource(
     private val tasksApiService: TasksApiService,
@@ -23,6 +26,28 @@ class RemoteDataSource(
         TODO("Not yet implemented")
     }
 
+    override suspend fun patchTasks(list: List<Task>): Result<List<Task>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val listToPatch = list.toTaskListRequest(context)
+                val response = withRetry {
+                    tasksApiService.patchTasks(
+                        lastKnownRevision,
+                        listToPatch,
+                    )
+                }
+                if (response.isSuccessful) {
+                    lastKnownRevision = response.body()!!.revision
+                    Result.success(response.body()!!.toList())
+                } else {
+                    Result.failure( HttpException(response) )
+                }
+            } catch(e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
     override suspend fun getTasks(): Result<List<Task>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -31,16 +56,10 @@ class RemoteDataSource(
                     lastKnownRevision = response.body()!!.revision
                     Result.success(response.body()!!.toList())
                 } else {
-                    Result.failure(
-                        IllegalStateException(
-                            "Error: ${
-                                response.errorBody().toString()
-                            }"
-                        )
-                    )
+                    Result.failure( HttpException(response) )
                 }
-            } catch (ex: Exception) { // TODO
-                Result.failure(ex)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
     }
@@ -49,58 +68,32 @@ class RemoteDataSource(
         return withContext(Dispatchers.IO) {
             try {
                 val response = withRetry { tasksApiService.getTask(taskId) }
-                if (response.isSuccessful) {
-                    val (task, revision) = response.body()!!.toTaskAndRevision()
-                    lastKnownRevision = revision
-                    Result.success(task)
-                } else {
-                    Result.failure(
-                        IllegalStateException(
-                            "Error: ${
-                                response.errorBody().toString()
-                            }"
-                        )
-                    )
-                }
-            } catch (ex: Exception) { // TODO
-                Result.failure(ex)
+                response.getResultAndUpdateRevision()
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
     }
 
-    override suspend fun addTask(task: Task) {
-        withContext(Dispatchers.IO) {
+    override suspend fun addTask(task: Task): Result<Task> {
+        return withContext(Dispatchers.IO) {
             try {
                 val taskRequest = task.toTaskRequest(context)
                 val response = withRetry {
-                    tasksApiService.putTask(
+                    tasksApiService.postTask(
                         lastKnownRevision,
-                        task.id,
                         taskRequest
                     )
                 }
-                if (response.isSuccessful) {
-                    val (receivedTask, revision) = response.body()!!.toTaskAndRevision()
-                    lastKnownRevision = revision
-                    Result.success(receivedTask)
-                } else {
-                    Result.failure(
-                        IllegalStateException(
-                            "Error: ${
-                                response.errorBody().toString()
-                            }"
-                        )
-                    )
-                }
-            } catch (ex: Exception) { // TODO
-                Log.d("", ex.stackTraceToString())
-                Result.failure(ex)
+                response.getResultAndUpdateRevision()
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
     }
 
-    override suspend fun updateTask(task: Task) {
-        withContext(Dispatchers.IO) {
+    override suspend fun updateTask(task: Task): Result<Task> {
+        return withContext(Dispatchers.IO) {
             try {
                 val response = withRetry {
                     tasksApiService.putTask(
@@ -109,20 +102,15 @@ class RemoteDataSource(
                         task.toTaskRequest(context),
                     )
                 }
-
-                if (response.isSuccessful) {
-                    Result.success(response.body()!!.toTaskAndRevision().first)
-                } else {
-                    Result.failure( IllegalStateException(response.errorBody().toString()) )
-                }
-            } catch(ex: Exception) { // TODO
-                Result.failure(ex)
+                response.getResultAndUpdateRevision()
+            } catch(e: Exception) {
+                Result.failure(e)
             }
         }
     }
 
-    override suspend fun changeCompleted(taskId: String) {
-        withContext(Dispatchers.IO) {
+    override suspend fun changeCompleted(taskId: String): Result<Task> {
+        return withContext(Dispatchers.IO) {
             try {
                 val task = withRetry { getTask(taskId) }
                 if (task.isSuccess) {
@@ -136,23 +124,18 @@ class RemoteDataSource(
                                 .toTaskRequest(context)
                         )
                     }
-                    if (response.isSuccessful) {
-                        lastKnownRevision = response.body()!!.revision
-                    } else { // TODO
-
-                    }
-                } else { // TODO
-
+                    response.getResultAndUpdateRevision()
+                } else {
+                    Result.failure( task.exceptionOrNull()!! )
                 }
-                Result.success(task)
-            } catch (ex: Exception) { // TODO
-                Result.failure(ex)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
     }
 
-    override suspend fun deleteTask(taskId: String) {
-        withContext(Dispatchers.IO) {
+    override suspend fun deleteTask(taskId: String): Result<Task> {
+        return withContext(Dispatchers.IO) {
             try {
                 val response = withRetry {
                     tasksApiService.deleteTask(
@@ -160,15 +143,20 @@ class RemoteDataSource(
                         taskId
                     )
                 }
-                if (response.isSuccessful) {
-                    val (task, revision) = response.body()!!.toTaskAndRevision()
-                    lastKnownRevision = revision
-                } else { // TODO
-
-                }
-            } catch (ex: Exception) { // TODO
-
+                response.getResultAndUpdateRevision()
+            } catch (e: Exception) {
+                Result.failure(e)
             }
+        }
+    }
+
+    private fun Response<TaskResponse>.getResultAndUpdateRevision(): Result<Task> {
+        return if (isSuccessful) {
+            val (task, revision) = body()!!.toTaskAndRevision()
+            lastKnownRevision = revision
+            Result.success(task)
+        } else {
+            Result.failure( HttpException(this) )
         }
     }
 }

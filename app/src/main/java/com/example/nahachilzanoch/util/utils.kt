@@ -1,13 +1,14 @@
 package com.example.nahachilzanoch.util
 
 import android.content.Context
-import android.provider.Settings.Secure;
-import com.example.nahachilzanoch.data.remote.models.TaskListResponse
-import com.example.nahachilzanoch.data.remote.models.TaskRequest
-import com.example.nahachilzanoch.data.remote.models.TaskResponse
+import android.provider.Settings.Secure
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
+import com.example.nahachilzanoch.data.remote.models.TaskListRequest
+import com.example.nahachilzanoch.data.remote.models.TaskListResponse
 import com.example.nahachilzanoch.data.remote.models.TaskNWModel
+import com.example.nahachilzanoch.data.remote.models.TaskRequest
+import com.example.nahachilzanoch.data.remote.models.TaskResponse
 import kotlinx.coroutines.delay
 import java.util.Date
 import kotlin.coroutines.cancellation.CancellationException
@@ -42,18 +43,7 @@ fun TaskNWModel.toTask(): Task {
 
 fun Task.toTaskRequest(context: Context): TaskRequest {
     return TaskRequest(
-        TaskNWModel (
-            id = id,
-            text = text,
-            importance = urgency.importance,
-            isDone = isDone,
-
-            createdAt = (creationDate/1000).toInt(),
-            deadline = if (deadlineDate != null) (deadlineDate/1000).toInt() else null,
-            changedAt = (lastEditDate/1000).toInt(),
-
-            device = getAndroidID(context)
-        )
+        this.toTaskNWModel(context)
     )
 }
 
@@ -68,11 +58,31 @@ fun TaskListResponse.toList(): List<Task> {
     return list.toList()
 }
 
+fun Task.toTaskNWModel(context: Context) = TaskNWModel(
+    id = id,
+    text = text,
+    importance = urgency.importance,
+    isDone = isDone,
+
+    createdAt = (creationDate/1000).toInt(),
+    deadline = if (deadlineDate != null) (deadlineDate/1000).toInt() else null,
+    changedAt = (lastEditDate/1000).toInt(),
+
+    device = getAndroidID(context)
+)
+
+fun List<Task>.toTaskListRequest(context: Context) =
+    TaskListRequest(
+        this.map {
+            it.toTaskNWModel(context)
+        }
+    )
+
 
 suspend fun <T> withRetry(
-    tryCnt: Int = 10,
+    tryCnt: Int = 3,
     fallbackValue: T? = null,
-    intervalMillis: (attempt: Int) -> Long = { it*2000L },
+    intervalMillis: (attempt: Int) -> Long = { it*1000L },
     retryCheck: (Throwable) -> Boolean = { true },
     block: suspend () -> T,
 ): T {

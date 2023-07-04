@@ -14,7 +14,7 @@ class DataRefreshWorker(
     params,
 ) {
     override suspend fun doWork(): Result {
-        if (tasksRepository.getTasks().isSuccess) return Result.success()
+        if (tasksRepository.updateFromRemote()) return Result.success()
         return Result.retry()
     }
 
