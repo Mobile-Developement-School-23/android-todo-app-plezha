@@ -1,14 +1,6 @@
 package com.example.nahachilzanoch.util
 
-import android.content.Context
-import android.provider.Settings.Secure
-import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
-import com.example.nahachilzanoch.data.remote.models.TaskListRequest
-import com.example.nahachilzanoch.data.remote.models.TaskListResponse
-import com.example.nahachilzanoch.data.remote.models.TaskNWModel
-import com.example.nahachilzanoch.data.remote.models.TaskRequest
-import com.example.nahachilzanoch.data.remote.models.TaskResponse
 import kotlinx.coroutines.delay
 import java.util.Date
 import kotlin.coroutines.cancellation.CancellationException
@@ -17,7 +9,7 @@ fun Long.getDate(): String {
     return Date(this).toString()
 }
 
-fun String.toUrgency(): Urgency = when(this){
+fun String.toUrgency(): Urgency = when(this) {
     Urgency.LOW.importance -> Urgency.LOW
     Urgency.NORMAL.importance -> Urgency.NORMAL
     Urgency.URGENT.importance -> Urgency.URGENT
