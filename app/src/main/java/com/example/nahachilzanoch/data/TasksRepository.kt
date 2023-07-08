@@ -2,8 +2,9 @@ package com.example.nahachilzanoch.data
 
 import com.example.nahachilzanoch.data.local.Task
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class TasksRepository(
+class TasksRepository @Inject constructor(
     private val localDataSource: DataSource,
     private val remoteDataSource: DataSource,
 ) {
