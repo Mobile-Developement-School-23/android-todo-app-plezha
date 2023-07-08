@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.util
+package com.example.nahachilzanoch.ui.view.util
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
+import com.example.nahachilzanoch.util.getDate
 
 class TasksAdapter(
     private val onCheckBoxClicked: (Task) -> Unit,

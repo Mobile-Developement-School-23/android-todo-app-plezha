@@ -17,67 +17,12 @@ fun Long.getDate(): String {
     return Date(this).toString()
 }
 
-private fun String.toUrgency(): Urgency = when(this){
-    "low" -> Urgency.LOW
-    "basic" -> Urgency.NORMAL
-    "important" -> Urgency.URGENT
-    else -> Urgency.NORMAL
+fun String.toUrgency(): Urgency = when(this){
+    Urgency.LOW.importance -> Urgency.LOW
+    Urgency.NORMAL.importance -> Urgency.NORMAL
+    Urgency.URGENT.importance -> Urgency.URGENT
+    else -> throw IllegalStateException("Urgency can't be formed from \"$this\"")
 }
-
-fun TaskResponse.toTaskAndRevision(): Pair<Task, Int> {
-    return task.toTask() to revision
-}
-
-fun TaskNWModel.toTask(): Task {
-    return Task(
-        id = id,
-        text = text,
-        urgency = importance.toUrgency(),
-        isDone = isDone,
-
-        creationDate = createdAt * 1000L,
-        deadlineDate = if (deadline != null) deadline * 1000L else null,
-        lastEditDate = changedAt * 1000L,
-    )
-}
-
-fun Task.toTaskRequest(context: Context): TaskRequest {
-    return TaskRequest(
-        this.toTaskNWModel(context)
-    )
-}
-
-fun getAndroidID(context: Context): String =
-    Secure.getString(context.contentResolver, Secure.ANDROID_ID)
-
-fun TaskListResponse.toList(): List<Task> {
-    val list = mutableListOf<Task>()
-    taskList.forEach {
-        list.add(it.toTask())
-    }
-    return list.toList()
-}
-
-fun Task.toTaskNWModel(context: Context) = TaskNWModel(
-    id = id,
-    text = text,
-    importance = urgency.importance,
-    isDone = isDone,
-
-    createdAt = (creationDate/1000).toInt(),
-    deadline = if (deadlineDate != null) (deadlineDate/1000).toInt() else null,
-    changedAt = (lastEditDate/1000).toInt(),
-
-    device = getAndroidID(context)
-)
-
-fun List<Task>.toTaskListRequest(context: Context) =
-    TaskListRequest(
-        this.map {
-            it.toTaskNWModel(context)
-        }
-    )
-
 
 suspend fun <T> withRetry(
     tryCnt: Int = 3,

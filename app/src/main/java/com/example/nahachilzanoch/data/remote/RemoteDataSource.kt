@@ -1,14 +1,13 @@
 package com.example.nahachilzanoch.data.remote
 
 import android.content.Context
-import android.util.Log
 import com.example.nahachilzanoch.data.DataSource
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.remote.models.TaskResponse
-import com.example.nahachilzanoch.util.toList
-import com.example.nahachilzanoch.util.toTaskAndRevision
-import com.example.nahachilzanoch.util.toTaskListRequest
-import com.example.nahachilzanoch.util.toTaskRequest
+import com.example.nahachilzanoch.data.toList
+import com.example.nahachilzanoch.data.toTaskAndRevision
+import com.example.nahachilzanoch.data.toTaskListRequest
+import com.example.nahachilzanoch.data.toTaskRequest
 import com.example.nahachilzanoch.util.withRetry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,9 +20,8 @@ class RemoteDataSource(
     private val context: Context,
 ) : DataSource {
     private var lastKnownRevision: Int = -1
-
     override fun observeTasks(): Flow<Result<List<Task>>> {
-        TODO("Not yet implemented")
+        TODO("I don't know how and don't need to implement it yet")
     }
 
     override suspend fun patchTasks(list: List<Task>): Result<List<Task>> {

@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.screens
+package com.example.nahachilzanoch.ui.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +13,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.databinding.MainFragmentBinding
-import com.example.nahachilzanoch.util.TaskListViewModel
-import com.example.nahachilzanoch.util.TasksAdapter
+import com.example.nahachilzanoch.ui.viewmodels.TaskListViewModel
+import com.example.nahachilzanoch.ui.view.util.TasksAdapter
 import kotlinx.coroutines.launch
 
 class MainFragment: Fragment() {

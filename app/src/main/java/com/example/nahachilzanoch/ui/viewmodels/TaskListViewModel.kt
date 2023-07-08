@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.util
+package com.example.nahachilzanoch.ui.viewmodels
 
 import android.util.Log
 import android.widget.Toast

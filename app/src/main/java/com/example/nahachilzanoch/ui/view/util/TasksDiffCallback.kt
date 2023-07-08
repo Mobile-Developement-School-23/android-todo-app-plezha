@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.util
+package com.example.nahachilzanoch.ui.view.util
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.nahachilzanoch.data.local.Task

@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.screens
+package com.example.nahachilzanoch.ui.view
 
 import android.graphics.Paint
 import android.os.Bundle
@@ -13,7 +13,7 @@ import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
 import com.example.nahachilzanoch.databinding.EditFragmentBinding
-import com.example.nahachilzanoch.util.TaskListViewModel
+import com.example.nahachilzanoch.ui.viewmodels.TaskListViewModel
 import com.example.nahachilzanoch.util.getDate
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.Calendar
@@ -40,6 +40,7 @@ class EditFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val task = getTask()
+        setupTask(task)
 
         var deadlineTime: Long? = null
 
@@ -49,16 +50,19 @@ class EditFragment : Fragment() {
         }
         val datePicker = setupDatePicker( onDeadlineChange )
 
-        binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
-        binding.deadlineDate.isVisible = task.deadlineDate != null
+        setSomeOnClickListeners(datePicker, task)
+        setMoreOnClickListeners(onDeadlineChange, task, deadlineTime)
+    }
 
-        binding.taskText.setText(task.text)
-
+    private fun setSomeOnClickListeners(
+        datePicker: MaterialDatePicker<Long>,
+        task: Task
+    ) {
         binding.deadlineDate.setOnClickListener {
             MaterialDatePicker.Builder.datePicker()
                 .setSelection(
-                MaterialDatePicker.todayInUtcMilliseconds()
-            )
+                    MaterialDatePicker.todayInUtcMilliseconds()
+                )
             datePicker.show(parentFragmentManager, "")
         }
 
@@ -70,9 +74,15 @@ class EditFragment : Fragment() {
             viewModel.deleteItem(task)
             findNavController().navigate(R.id.action_fragment2_to_fragment1)
         }
+    }
 
+    private fun setMoreOnClickListeners(
+        onDeadlineChange: (Long) -> Unit,
+        task: Task,
+        deadlineTime: Long?
+    ) {
         binding.deadlineSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) onDeadlineChange( Calendar.getInstance().time.time )
+            if (isChecked) onDeadlineChange(Calendar.getInstance().time.time)
             binding.deadlinePickerLine.isVisible = isChecked
         }
 
@@ -84,7 +94,7 @@ class EditFragment : Fragment() {
                         R.id.buttonUrgencyLow -> Urgency.LOW
                         R.id.buttonUrgencyNormal -> Urgency.NORMAL
                         R.id.buttonUrgencyUrgent -> Urgency.URGENT
-                        else -> Urgency.NORMAL // Any way to delete that stub?
+                        else -> Urgency.NORMAL // Any way to get rid of that stub?
                     },
                     deadlineDate = deadlineTime,
                     lastEditDate = Calendar.getInstance().time.time,
@@ -128,7 +138,7 @@ class EditFragment : Fragment() {
         return datePicker
     }
 
-    private fun initTask(task: Task) {
+    private fun setupTask(task: Task) {
         binding.toggleButton.check(
             when (task.urgency) {
                 Urgency.LOW -> R.id.buttonUrgencyLow
@@ -143,5 +153,9 @@ class EditFragment : Fragment() {
         } else {
             binding.deadlinePickerLine.isVisible = false
         }
+        binding.deadlineDate.paintFlags = binding.deadlineDate.paintFlags + Paint.UNDERLINE_TEXT_FLAG
+        binding.deadlineDate.isVisible = task.deadlineDate != null
+
+        binding.taskText.setText(task.text)
     }
 }
