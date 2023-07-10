@@ -1,5 +1,6 @@
 package com.example.nahachilzanoch.ui.view
 
+import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.data.local.Task
@@ -18,15 +20,26 @@ import com.example.nahachilzanoch.util.getDate
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.Calendar
 import java.util.UUID
+import javax.inject.Inject
 
 
 class EditFragment : Fragment() {
-    private val viewModel by activityViewModels<TaskListViewModel> { TaskListViewModel.Factory }
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val viewModel by viewModels<TaskListViewModel> { viewModelFactory }
 
     private var _binding: EditFragmentBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        (activity as MainActivity).mainActivityComponent.todoEditorComponent().manufacture()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

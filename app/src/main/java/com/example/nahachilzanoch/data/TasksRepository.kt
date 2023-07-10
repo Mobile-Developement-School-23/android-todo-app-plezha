@@ -1,12 +1,16 @@
 package com.example.nahachilzanoch.data
 
+import com.example.nahachilzanoch.data.di.ActivityScope
+import com.example.nahachilzanoch.data.local.LocalDataSource
 import com.example.nahachilzanoch.data.local.Task
+import com.example.nahachilzanoch.data.remote.RemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+@ActivityScope
 class TasksRepository @Inject constructor(
-    private val localDataSource: DataSource,
-    private val remoteDataSource: DataSource,
+    private val localDataSource: LocalDataSource,
+    private val remoteDataSource: RemoteDataSource,
 ) {
     fun observeTasks(): Flow<Result<List<Task>>> {
         return localDataSource.observeTasks()

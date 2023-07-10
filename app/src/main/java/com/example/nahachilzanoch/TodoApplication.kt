@@ -1,60 +1,33 @@
 package com.example.nahachilzanoch
 
 import android.app.Application
-import androidx.room.Room
+import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.example.nahachilzanoch.data.TasksRepository
-import com.example.nahachilzanoch.data.local.LocalDataSource
-import com.example.nahachilzanoch.data.local.TasksDatabase
+import com.example.nahachilzanoch.data.di.AppComponent
+import com.example.nahachilzanoch.data.di.DaggerAppComponent
 import com.example.nahachilzanoch.data.remote.DataRefreshWorker
-import com.example.nahachilzanoch.data.remote.RemoteDataSource
-import com.example.nahachilzanoch.data.remote.TasksApiService
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 const val BASE_URL = "https://beta.mrdekk.ru/todobackend/"
 
 class TodoApplication : Application() {
-    lateinit var tasksRepository: TasksRepository
+
+    val appComponent: AppComponent by lazy {
+        DaggerAppComponent.factory().manufacture(
+            applicationContext
+        )
+    }
+
     override fun onCreate() {
         super.onCreate()
 
-        initTasksRepository()
+        appComponent.inject(this)
         startDataRefreshWorker()
-    }
-
-    private fun initTasksRepository() {
-        val retrofit = Retrofit.Builder()
-            .addConverterFactory(
-                GsonConverterFactory.create()
-            )
-            .baseUrl(BASE_URL)
-            .build()
-
-        val tasksApiService = retrofit.create(TasksApiService::class.java)
-
-        val remoteDataSource = RemoteDataSource(
-            tasksApiService,
-            applicationContext,
-        )
-
-        val localDataSource = LocalDataSource(
-            Room.databaseBuilder(
-                applicationContext,
-                TasksDatabase::class.java, "Tasks.db",
-            ).build().taskDao()
-        )
-
-        tasksRepository = TasksRepository(
-            localDataSource,
-            remoteDataSource
-        )
     }
 
     private fun startDataRefreshWorker() {
@@ -79,3 +52,9 @@ class TodoApplication : Application() {
             .enqueue(dataRefreshWorkRequest)
     }
 }
+
+val Context.appComponent: AppComponent
+    get() = when (this) {
+        is TodoApplication -> appComponent
+        else -> this.applicationContext.appComponent
+    }

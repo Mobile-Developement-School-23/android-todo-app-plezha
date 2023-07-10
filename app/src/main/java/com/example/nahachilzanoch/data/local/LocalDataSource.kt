@@ -1,6 +1,5 @@
 package com.example.nahachilzanoch.data.local
 
-import com.example.nahachilzanoch.data.DataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,22 +7,18 @@ import kotlinx.coroutines.withContext
 
 class LocalDataSource(
     private val tasksDao: TasksDao,
-) : DataSource {
-    override fun observeTasks(): Flow<Result<List<Task>>> {
+) {
+    fun observeTasks(): Flow<Result<List<Task>>> {
         return tasksDao.observeTasks().map { Result.success(it) }
     }
 
-    override suspend fun patchTasks(list: List<Task>): Result<List<Task>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getTasks(): Result<List<Task>> {
+    suspend fun getTasks(): Result<List<Task>> {
         return withContext(Dispatchers.IO) {
             Result.success(tasksDao.getTasks())
         }
     }
 
-    override suspend fun getTask(taskId: String): Result<Task> {
+    suspend fun getTask(taskId: String): Result<Task> {
         return withContext(Dispatchers.IO) {
             val task = tasksDao.getTaskById(taskId)
             if (task == null) {
@@ -34,14 +29,14 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun addTask(task: Task): Result<Task> {
+    suspend fun addTask(task: Task): Result<Task> {
         return withContext(Dispatchers.IO) {
             tasksDao.insertTask(task)
             Result.success(task)
         }
     }
 
-    override suspend fun updateTask(task: Task): Result<Task> {
+    suspend fun updateTask(task: Task): Result<Task> {
         return withContext(Dispatchers.IO) {
             try {
                 tasksDao.updateTask(task)
@@ -52,7 +47,7 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun changeCompleted(taskId: String): Result<Task> {
+    suspend fun changeCompleted(taskId: String): Result<Task> {
         return withContext(Dispatchers.IO) {
             try {
                 tasksDao.changeCompleted(taskId)
@@ -65,7 +60,7 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun deleteTask(taskId: String): Result<Task> {
+    suspend fun deleteTask(taskId: String): Result<Task> {
         return withContext(Dispatchers.IO) {
             try {
                 tasksDao.deleteTaskById(taskId)

@@ -1,28 +1,41 @@
 package com.example.nahachilzanoch.ui.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.databinding.MainFragmentBinding
-import com.example.nahachilzanoch.ui.viewmodels.TaskListViewModel
 import com.example.nahachilzanoch.ui.view.util.TasksAdapter
+import com.example.nahachilzanoch.ui.viewmodels.TaskListViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class MainFragment: Fragment() {
-    private val viewModel by activityViewModels<TaskListViewModel> { TaskListViewModel.Factory }
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val viewModel by viewModels<TaskListViewModel> { viewModelFactory }
 
     private var _binding: MainFragmentBinding? = null
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        (activity as MainActivity).mainActivityComponent.todoListComponent().manufacture()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
