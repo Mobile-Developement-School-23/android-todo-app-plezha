@@ -8,9 +8,10 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.example.nahachilzanoch.data.di.DaggerAppComponent
+
 import com.example.nahachilzanoch.data.remote.DataRefreshWorker
 import com.example.nahachilzanoch.di.AppComponent
+import com.example.nahachilzanoch.di.DaggerAppComponent
 import java.util.concurrent.TimeUnit
 
 const val BASE_URL = "https://beta.mrdekk.ru/todobackend/"
