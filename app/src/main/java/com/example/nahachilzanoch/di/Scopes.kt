@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.data.di
+package com.example.nahachilzanoch.di
 
 import javax.inject.Scope
 

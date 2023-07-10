@@ -1,9 +1,9 @@
 package com.example.nahachilzanoch.data
 
-import com.example.nahachilzanoch.data.di.ActivityScope
 import com.example.nahachilzanoch.data.local.LocalDataSource
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.remote.RemoteDataSource
+import com.example.nahachilzanoch.di.ActivityScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
