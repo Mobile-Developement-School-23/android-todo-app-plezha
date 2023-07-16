@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.ui.view.util
+package com.example.nahachilzanoch.ui.list.util
 
 import android.view.LayoutInflater
 import android.view.View

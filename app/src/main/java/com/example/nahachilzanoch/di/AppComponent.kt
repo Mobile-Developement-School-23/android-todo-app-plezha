@@ -2,7 +2,7 @@ package com.example.nahachilzanoch.di
 
 import android.content.Context
 import com.example.nahachilzanoch.TodoApplication
-import com.example.nahachilzanoch.ui.view.di.MainActivityComponent
+import com.example.nahachilzanoch.ui.activity.di.MainActivityComponent
 import dagger.BindsInstance
 import dagger.Component
 

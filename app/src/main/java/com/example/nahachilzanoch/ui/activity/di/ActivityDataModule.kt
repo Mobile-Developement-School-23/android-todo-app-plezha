@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.ui.view.di
+package com.example.nahachilzanoch.ui.activity.di
 
 import android.content.Context
 import androidx.room.Room

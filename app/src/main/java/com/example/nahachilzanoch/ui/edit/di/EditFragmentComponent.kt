@@ -1,7 +1,7 @@
-package com.example.nahachilzanoch.ui.view.di
+package com.example.nahachilzanoch.ui.edit.di
 
 import com.example.nahachilzanoch.di.FragmentScope
-import com.example.nahachilzanoch.ui.view.EditFragment
+import com.example.nahachilzanoch.ui.edit.view.EditFragment
 import dagger.Subcomponent
 
 @Subcomponent

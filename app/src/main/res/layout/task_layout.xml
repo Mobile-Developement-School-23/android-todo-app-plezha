@@ -21,6 +21,7 @@
         android:id="@+id/showMore"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:tint="?attr/colorOnPrimary"
         android:src="@drawable/baseline_keyboard_arrow_right_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -63,6 +64,7 @@
                 />
 
             <com.google.android.material.textview.MaterialTextView
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:id="@+id/taskText"
                 android:ellipsize="end"
                 android:maxLines="3"
@@ -85,9 +87,11 @@
                 android:layout_height="wrap_content"
                 android:scaleX="0.7"
                 android:scaleY="0.7"
-                android:src="@drawable/baseline_calendar_month_24" />
+                android:src="@drawable/baseline_calendar_month_24"
+                android:tint="?attr/colorOnPrimary" />
 
             <com.google.android.material.textview.MaterialTextView
+                style="@style/TextAppearance.Material3.BodySmall"
                 android:id="@+id/dateText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

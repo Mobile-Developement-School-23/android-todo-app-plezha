@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.ui.view
+package com.example.nahachilzanoch.ui.list.view
 
 import android.content.Context
 import android.os.Bundle
@@ -15,8 +15,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.databinding.MainFragmentBinding
-import com.example.nahachilzanoch.ui.view.util.TasksAdapter
-import com.example.nahachilzanoch.ui.viewmodels.TaskListViewModel
+import com.example.nahachilzanoch.ui.activity.TaskListViewModel
+import com.example.nahachilzanoch.ui.activity.view.MainActivity
+import com.example.nahachilzanoch.ui.list.util.TasksAdapter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

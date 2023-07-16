@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.ui.view
+package com.example.nahachilzanoch.ui.activity.view
 
 import android.net.ConnectivityManager
 import android.net.Network
@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.nahachilzanoch.appComponent
 import com.example.nahachilzanoch.databinding.ActivityMainBinding
-import com.example.nahachilzanoch.ui.viewmodels.TaskListViewModel
+import com.example.nahachilzanoch.ui.activity.TaskListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

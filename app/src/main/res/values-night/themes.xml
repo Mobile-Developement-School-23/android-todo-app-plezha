@@ -36,14 +36,5 @@
         <item name="back_secondary">@color/back_dark_secondary</item>
         <item name="back_elevated">@color/back_dark_elevated</item>
 
-        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
-        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
-        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.Material3.BodyLarge</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.Material3.BodyMedium</item>
-        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
-        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
-        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
-
     </style>
 </resources>

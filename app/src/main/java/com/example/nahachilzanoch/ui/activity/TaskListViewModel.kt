@@ -1,4 +1,4 @@
-package com.example.nahachilzanoch.ui.viewmodels
+package com.example.nahachilzanoch.ui.activity
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

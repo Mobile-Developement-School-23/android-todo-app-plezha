@@ -1,7 +1,9 @@
-package com.example.nahachilzanoch.ui.view.di
+package com.example.nahachilzanoch.ui.activity.di
 
 import com.example.nahachilzanoch.di.ActivityScope
-import com.example.nahachilzanoch.ui.view.MainActivity
+import com.example.nahachilzanoch.ui.activity.view.MainActivity
+import com.example.nahachilzanoch.ui.edit.di.EditFragmentComponent
+import com.example.nahachilzanoch.ui.list.di.MainFragmentComponent
 import dagger.Subcomponent
 
 @ActivityScope
