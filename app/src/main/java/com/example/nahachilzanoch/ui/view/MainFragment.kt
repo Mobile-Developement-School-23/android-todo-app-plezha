@@ -24,7 +24,11 @@ class MainFragment: Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val viewModel by viewModels<TaskListViewModel> { viewModelFactory }
+    private val viewModel by viewModels<TaskListViewModel>(
+        { activity as MainActivity }
+    ) { viewModelFactory }
+
+    //private val viewModel by viewModels<TaskListViewModel> { viewModelFactory }
 
     private var _binding: MainFragmentBinding? = null
     // This property is only valid between onCreateView and onDestroyView.
@@ -107,7 +111,7 @@ class MainFragment: Fragment() {
         _binding = null
     }
 
-    fun setupRV() {
+    private fun setupRV() {
         val tasksRV = binding.tasks
         val tasksAdapter = TasksAdapter(
             onCheckBoxClicked = { viewModel.updateCompleted(it.id) },

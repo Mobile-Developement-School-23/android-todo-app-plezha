@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.nahachilzanoch.R
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.local.Urgency
-import com.example.nahachilzanoch.util.getDate
+import com.example.nahachilzanoch.util.getDateAndTimeString
 
 class TasksAdapter(
     private val onCheckBoxClicked: (Task) -> Unit,
@@ -36,11 +36,11 @@ class TasksAdapter(
 
         fun bind(task: Task) {
             checkbox.isChecked = task.isDone
-
             if (task.deadlineDate == null)
                 dateLine.isVisible = false
             else {
-                dateTextView.text = task.deadlineDate.getDate()
+                dateLine.isVisible = true
+                dateTextView.text = task.deadlineDate.getDateAndTimeString()
             }
 
             urgencyImage.isVisible = task.urgency == Urgency.LOW

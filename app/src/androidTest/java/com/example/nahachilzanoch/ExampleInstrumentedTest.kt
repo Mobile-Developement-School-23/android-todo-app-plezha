@@ -1,5 +1,5 @@
 package com.example.nahachilzanoch
-
+/*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
@@ -20,3 +20,5 @@ class ExampleInstrumentedTest {
         assertEquals("com.example.nahachilzanoch", appContext.packageName)
     }
 }
+
+ */

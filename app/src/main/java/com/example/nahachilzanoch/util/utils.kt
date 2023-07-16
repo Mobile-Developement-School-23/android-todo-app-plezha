@@ -5,9 +5,15 @@ import kotlinx.coroutines.delay
 import java.util.Date
 import kotlin.coroutines.cancellation.CancellationException
 
-fun Long.getDate(): String {
-    return Date(this).toString()
+fun Long.getDateString(): String {
+    return Date(this)
+        .toString()
+        .split(" ")
+        .slice(0..2)
+        .joinToString(" ")
 }
+
+fun Long.getDateAndTimeString(): String = Date(this).toString()
 
 fun String.toUrgency(): Urgency = when(this) {
     Urgency.LOW.importance -> Urgency.LOW

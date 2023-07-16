@@ -1,5 +1,7 @@
 <resources>
-    <style name="Theme.Nahachilzanoch" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.Nahachilzanoch" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
         <item name="android:colorBackground">@color/back_light_primary</item>
 
         <item name="colorSurface">@color/back_light_primary</item>
@@ -17,5 +19,31 @@
 
         <item name="colorError">@color/color_light_red</item>
         <item name="colorOnError">@color/label_light_primary</item>
+
+        <item name="support_separator">@color/support_light_separator</item>
+        <item name="support_overlay">@color/support_light_overlay</item>
+        <item name="label_primary">@color/label_light_primary</item>
+        <item name="label_secondary">@color/label_light_secondary</item>
+        <item name="label_tertiary">@color/label_light_tertiary</item>
+        <item name="label_disable">@color/label_light_disable</item>
+        <item name="color_red">@color/color_light_red</item>
+        <item name="color_green">@color/color_light_green</item>
+        <item name="color_blue">@color/color_light_blue</item>
+        <item name="color_gray">@color/color_light_gray</item>
+        <item name="color_gray_light">@color/color_light_gray_light</item>
+        <item name="color_white">@color/color_light_white</item>
+        <item name="back_primary">@color/back_light_primary</item>
+        <item name="back_secondary">@color/back_light_secondary</item>
+        <item name="back_elevated">@color/back_light_elevated</item>
+
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Material3.BodyLarge</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
+
     </style>
 </resources>
