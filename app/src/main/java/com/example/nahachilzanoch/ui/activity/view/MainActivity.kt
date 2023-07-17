@@ -1,5 +1,8 @@
 package com.example.nahachilzanoch.ui.activity.view
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -13,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.nahachilzanoch.appComponent
 import com.example.nahachilzanoch.databinding.ActivityMainBinding
 import com.example.nahachilzanoch.ui.activity.TaskListViewModel
+import com.example.nahachilzanoch.ui.notifications.reminderNotificationChannelID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +40,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setupOnNetworkAvailableCallback()
+        collectErrors()
+        createReminderNotificationsChannel()
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+
+    private fun createReminderNotificationsChannel() {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val channel = NotificationChannel(
+            reminderNotificationChannelID,
+            "Reminders",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+
+        notificationManager.createNotificationChannel(channel)
+    }
+
+
+
+    private fun collectErrors() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.errorStringFlow.collect {
                 if (it != null) {
@@ -44,9 +70,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
     }
 
     private fun setupOnNetworkAvailableCallback() {

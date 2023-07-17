@@ -26,7 +26,6 @@ class TaskListViewModel @Inject constructor(
 
 
     init {
-        Log.d("", "VM INIT")
         viewModelScope.launch(Dispatchers.IO) {
             launch {
                 updateFromRemote()

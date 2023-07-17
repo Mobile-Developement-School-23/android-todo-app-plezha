@@ -28,7 +28,7 @@ class TodoApplication : Application() {
         super.onCreate()
 
         appComponent.inject(this)
-        startDataRefreshWorker()
+        //startDataRefreshWorker() it crashes the app
     }
 
     private fun startDataRefreshWorker() {

@@ -4,6 +4,7 @@ import com.example.nahachilzanoch.data.local.LocalDataSource
 import com.example.nahachilzanoch.data.local.Task
 import com.example.nahachilzanoch.data.remote.RemoteDataSource
 import com.example.nahachilzanoch.di.ActivityScope
+import com.example.nahachilzanoch.ui.notifications.NotificationsManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -11,6 +12,7 @@ import javax.inject.Inject
 class TasksRepository @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val remoteDataSource: RemoteDataSource,
+    private val notificationsManager: NotificationsManager,
 ) {
     fun observeTasks(): Flow<Result<List<Task>>> {
         return localDataSource.observeTasks()
@@ -35,7 +37,10 @@ class TasksRepository @Inject constructor(
                 localDataSource.addTask(task)
             }
         }
-        remoteDataSource.patchTasks( localDataSource.getTasks().getOrNull()!! )
+        val tasks =
+            remoteDataSource.patchTasks( localDataSource.getTasks().getOrNull()!! ).getOrNull()
+        if (tasks != null) notificationsManager.refreshNotifications(tasks)
+
         return remoteTasks.isSuccess
     }
 
@@ -49,11 +54,13 @@ class TasksRepository @Inject constructor(
 
     suspend fun addTask(task: Task): Result<Task> {
         localDataSource.addTask(task)
+        notificationsManager.scheduleNotification(task)
         return remoteDataSource.addTask(task)
     }
 
     suspend fun updateTask(task: Task): Result<Task> {
         localDataSource.updateTask(task)
+        notificationsManager.scheduleNotification(task)
         return remoteDataSource.updateTask(task)
     }
 
@@ -63,6 +70,7 @@ class TasksRepository @Inject constructor(
     }
     suspend fun deleteTask(taskId: String): Result<Task>  {
         localDataSource.deleteTask(taskId)
+        notificationsManager.cancelNotification(taskId)
         return remoteDataSource.deleteTask(taskId)
     }
 
