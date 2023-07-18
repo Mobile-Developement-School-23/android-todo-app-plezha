@@ -1,29 +1,29 @@
 package com.example.nahachilzanoch.ui.notifications
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.nahachilzanoch.data.local.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 
 private val Context.mapDataStore: DataStore<Preferences> by preferencesDataStore(name = "taskId_toNotificationKey_map")
-private val Context.rmapDataStore: DataStore<Preferences> by preferencesDataStore(name = "taskId_toNotificationKey_rmap")
 
 // haha ya ebal)
 class NotificationsManager @Inject constructor(
     private val context: Context,
     private val alarmScheduler: AlarmScheduler
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO) // TODO: eat that shit so nobody sees it
+    private val scope = CoroutineScope(Dispatchers.IO) // TODO: is it ok?
     private val taskIdToNotificationIdMap = mutableMapOf<String, Int>()
     private val notificationIdToTaskIdMap = mutableMapOf<Int, String>() // TODO: BiMap???
     private var safeNotificationId = 1
@@ -34,57 +34,49 @@ class NotificationsManager @Inject constructor(
         }
 
     private val taskIdToNotificationIdMapDataStore = context.mapDataStore
-    private val notificationIdToTaskIdMapDataStore = context.rmapDataStore
 
 
     init {
-        scope.launch {
+        scope.launch() {
             taskIdToNotificationIdMapDataStore.data.last().asMap().forEach {
                 taskIdToNotificationIdMap[it.key.name] = it.value as Int
-            }
-            notificationIdToTaskIdMapDataStore.data.last().asMap().forEach {
-                notificationIdToTaskIdMap[it.key.name.toInt()] = it.value as String
+                notificationIdToTaskIdMap[it.value as Int] = it.key.name
             }
         }
+        Thread.sleep(100)
     }
 
     private fun addToMap(taskId: String, notificationId: Int) {
+        taskIdToNotificationIdMap[taskId] = notificationId
+        notificationIdToTaskIdMap[notificationId] = taskId
         scope.launch {
             taskIdToNotificationIdMapDataStore.edit {
                 it[intPreferencesKey(taskId)] = notificationId
             }
-            notificationIdToTaskIdMapDataStore.edit {
-                it[stringPreferencesKey(notificationId.toString())] = taskId
-            }
-            taskIdToNotificationIdMap[taskId] = notificationId
-            notificationIdToTaskIdMap[notificationId] = taskId
         }
     }
 
     private fun clearMap() {
         scope.launch {
             taskIdToNotificationIdMapDataStore.edit { it.clear() }
-            notificationIdToTaskIdMapDataStore.edit { it.clear() }
-            notificationIdToTaskIdMap.clear()
-            taskIdToNotificationIdMap.clear()
         }
+        notificationIdToTaskIdMap.clear()
+        taskIdToNotificationIdMap.clear()
     }
 
     private fun removeFromMap(taskId: String) {
+        val notificationId = taskIdToNotificationIdMap[taskId]
         scope.launch {
-            val notificationId = taskIdToNotificationIdMap[taskId]
             taskIdToNotificationIdMapDataStore.edit {
                 it.remove( intPreferencesKey(taskId) )
             }
-            notificationIdToTaskIdMapDataStore.edit {
-                it.remove( stringPreferencesKey(notificationId.toString()) )
-            }
-            taskIdToNotificationIdMap.remove( taskId )
-            notificationIdToTaskIdMap.remove( notificationId )
         }
+        taskIdToNotificationIdMap.remove( taskId )
+        notificationIdToTaskIdMap.remove( notificationId )
     }
 
     fun refreshNotifications(list: List<Task>) {
+        Log.d("", "refreshed notifs from $list")
         cancelAllNotifications()
         list.forEach { scheduleNotification(it) }
     }
@@ -106,13 +98,16 @@ class NotificationsManager @Inject constructor(
 
 
     fun scheduleNotification(task: Task) {
+        Log.d("", "scheduling $task from NotificationsManager")
         addToMap(task.id, safeNotificationId)
-        alarmScheduler.scheduleNotification(
-            task.deadlineDate ?: return,
-            task.urgency.importance,
-            task.text,
-            taskIdToNotificationIdMap[task.id] ?: return
-        )
+        if (!task.isDone && task.deadlineDate != null && task.deadlineDate > Calendar.getInstance().time.time) {
+            alarmScheduler.scheduleNotification(
+                task.deadlineDate,
+                task.urgency.importance,
+                task.text,
+                taskIdToNotificationIdMap[task.id] ?: return
+            )
+        }
     }
 
 }

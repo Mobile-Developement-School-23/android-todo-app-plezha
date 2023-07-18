@@ -13,7 +13,6 @@ class AlarmScheduler @Inject constructor(
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     fun scheduleNotification(time: Long, title: String, message: String, id: Int) {
-
         val intent = Intent(context, ReminderNotification::class.java)
         intent.putExtra(titleKey, title)
         intent.putExtra(messageKey, message)

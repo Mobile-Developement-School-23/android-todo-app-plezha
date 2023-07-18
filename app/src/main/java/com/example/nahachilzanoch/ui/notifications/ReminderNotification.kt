@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.example.nahachilzanoch.R
 
 const val reminderNotificationChannelID = "reminders"
 const val titleKey = "title"
@@ -16,6 +17,7 @@ class ReminderNotification : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, reminderNotificationChannelID)
             .setContentTitle(intent.getStringExtra(titleKey))
             .setContentText(intent.getStringExtra(messageKey))
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
 
         val notificationManager =
